@@ -1,0 +1,13 @@
+hosts.conf
+
+# Created by https://www.gitignore.io/api/ansible
+# Edit at https://www.gitignore.io/?templates=ansible
+
+### Ansible ###
+*.retry
+
+
+# End of https://www.gitignore.io/api/ansible
+bkp
+result
+*.img
