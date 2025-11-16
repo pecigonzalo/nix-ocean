@@ -5,6 +5,10 @@
     disko.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager = {
+      url = "github:nix-community/home-manager/release-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     
     # Secrets repository (separate git repo)
     secrets = {
@@ -18,6 +22,7 @@
       nixpkgs,
       disko,
       agenix,
+      home-manager,
       secrets,
       ...
     }:
@@ -35,6 +40,8 @@
         manta = {
           path = "manta";
           system = "x86_64-linux";
+          modules = [ home-manager.nixosModules.home-manager ];
+          targetHost = "root@78.46.73.81";
         };
 
         # Reef cluster nodes
@@ -74,6 +81,8 @@
         system: name:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          hostTarget =
+            hosts.${name}.targetHost or "root@${name}";
         in
         {
           "deploy-${name}" = {
@@ -82,8 +91,8 @@
               pkgs.writeShellScript "deploy-${name}" ''
                 exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng switch \
                   --flake ".#${name}" \
-                  --target-host "root@${name}" \
-                  --build-host "root@${name}"
+                  --target-host "${hostTarget}" \
+                  --build-host "${hostTarget}"
               ''
             );
           };
@@ -93,8 +102,8 @@
               pkgs.writeShellScript "build-${name}" ''
                 exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng build \
                   --flake ".#${name}" \
-                  --target-host "root@${name}" \
-                  --build-host "root@${name}"
+                  --target-host "${hostTarget}" \
+                  --build-host "${hostTarget}"
               ''
             );
           };
