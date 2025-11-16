@@ -41,7 +41,6 @@
           path = "manta";
           system = "x86_64-linux";
           modules = [ home-manager.nixosModules.home-manager ];
-          targetHost = "root@78.46.73.81";
         };
 
         # Reef cluster nodes
@@ -81,8 +80,6 @@
         system: name:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          hostTarget =
-            hosts.${name}.targetHost or "root@${name}";
         in
         {
           "deploy-${name}" = {
@@ -91,8 +88,8 @@
               pkgs.writeShellScript "deploy-${name}" ''
                 exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng switch \
                   --flake ".#${name}" \
-                  --target-host "${hostTarget}" \
-                  --build-host "${hostTarget}"
+                  --target-host "root@${name}" \
+                  --build-host "root@${name}"
               ''
             );
           };
@@ -102,8 +99,8 @@
               pkgs.writeShellScript "build-${name}" ''
                 exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng build \
                   --flake ".#${name}" \
-                  --target-host "${hostTarget}" \
-                  --build-host "${hostTarget}"
+                  --target-host "root@${name}" \
+                  --build-host "root@${name}"
               ''
             );
           };
