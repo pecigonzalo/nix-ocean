@@ -1,5 +1,12 @@
 { ... }:
 {
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+    algorithm = "zstd";
+    priority = 10;
+  };
+
   boot.kernel.sysctl = {
     "fs.file-max" = 2097152;
     "kernel.task_delayacct" = 1;
