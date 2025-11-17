@@ -4,7 +4,6 @@
 { modulesPath, ... }:
 {
   imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
     ../../modules/common/base.nix
     ../../modules/common/performance.nix
     ../../modules/common/server-tools.nix
