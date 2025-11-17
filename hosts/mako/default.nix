@@ -3,7 +3,6 @@
 # hardware: Intel N150, 12GB, 512GB SSD
 {
   modulesPath,
-  config,
   secrets,
   ...
 }:
