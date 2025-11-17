@@ -26,32 +26,5 @@ in
       enable = true;
       cpuFreqGovernor = lib.mkDefault perfCfg.cpuGovernor; # Best for modern CPUs with HWP
     };
-
-    # Enable SSD trimming for better disk performance and longevity
-    services.fstrim = {
-      enable = true;
-      interval = "weekly";
-    };
-
-    # Modern I/O scheduler (automatic selection based on disk type)
-    # NixOS already does this automatically via udev rules
-
-    # Systemd optimizations
-    systemd = {
-      # Reduce shutdown timeout
-      extraConfig = ''
-        DefaultTimeoutStopSec=10s
-        DefaultTimeoutStartSec=10s
-      '';
-
-      # Optimize service startup
-      services = {
-        # Make networkd and resolved wait for online faster
-        systemd-networkd-wait-online.serviceConfig.ExecStart = [
-          ""
-          "${config.systemd.package}/lib/systemd/systemd-networkd-wait-online --any"
-        ];
-      };
-    };
   };
 }

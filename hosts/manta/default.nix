@@ -135,7 +135,6 @@
     iotop
     iotop-c
     ngrep
-    neofetch
     netcat-gnu
     wget
     curl
@@ -182,5 +181,5 @@
   ];
 
   # State version
-  system.stateVersion = "22.05";
+  system.stateVersion = "25.05";
 }

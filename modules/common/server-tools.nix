@@ -9,7 +9,6 @@
     map lib.lowPrio [
       gitMinimal
       neovim
-      bluez
       curl
       dig
       iftop
@@ -19,6 +18,7 @@
       traceroute
       usbutils
       pciutils
+      fastfetch
     ];
 
   programs.htop = {

@@ -1,4 +1,6 @@
 {
+  pkgs,
+  lib,
   ...
 }:
 {
@@ -19,4 +21,16 @@
     algorithm = "zstd";
     priority = 10;
   };
+
+  # Enable SSD trimming for better disk performance and longevity
+  services.fstrim = {
+    enable = true;
+    interval = "weekly";
+  };
+
+  environment.systemPackages =
+    with pkgs;
+    map lib.lowPrio [
+      bluez
+    ];
 }
