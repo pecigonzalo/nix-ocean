@@ -13,6 +13,26 @@
     sleep = 20;
   };
 
+  hardware.firmware = with pkgs; [
+    linux-firmware
+    wireless-regdb
+  ];
+
+  # Modern Bluetooth configuration
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Experimental = true;
+        FastConnectable = true;
+      };
+      Policy = {
+        AutoEnable = true;
+      };
+    };
+  };
+
   services.thermald.enable = true;
 
   zramSwap = {

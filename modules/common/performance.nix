@@ -6,7 +6,7 @@ in
 {
   options.ocean.performance.cpuGovernor = mkOption {
     type = types.str;
-    default = "schedutil";
+    default = "schedutil"; # Modern default governor
     description = "Default CPU frequency governor for hosts.";
     example = "ondemand";
   };
@@ -24,7 +24,7 @@ in
     # Modern CPU frequency scaling
     powerManagement = {
       enable = true;
-      cpuFreqGovernor = lib.mkDefault perfCfg.cpuGovernor; # Best for modern CPUs with HWP
+      cpuFreqGovernor = lib.mkDefault perfCfg.cpuGovernor;
     };
   };
 }
