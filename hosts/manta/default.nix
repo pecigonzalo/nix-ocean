@@ -40,6 +40,20 @@
   };
 
   boot = {
+    loader = {
+      systemd-boot.enable = false;
+      efi.canTouchEfiVariables = false;
+      grub = {
+        enable = true;
+        efiSupport = false;
+        devices = [
+          "/dev/sda"
+          "/dev/sdb"
+          "/dev/sdc"
+          "/dev/sdd"
+        ];
+      };
+    };
     initrd.kernelModules = [ "i915" ];
     kernelParams = [
       "acpi_osi=Linux"
@@ -67,18 +81,6 @@
   };
 
   ocean = {
-    boot = {
-      loader = "grub";
-      efiCanTouchVariables = false;
-      grubDevices = [
-        "/dev/sda"
-        "/dev/sdb"
-        "/dev/sdc"
-        "/dev/sdd"
-      ];
-      grubEfiSupport = false;
-    };
-
     nix = {
       gcSchedule = "12:50";
       gcOptions = "--delete-older-than 15d";
@@ -93,29 +95,8 @@
   programs.fish.enable = true;
 
   environment.systemPackages = with pkgs; [
-    iotop
-    iotop-c
-    ngrep
-    netcat-gnu
-    wget
-    ldns
-    dnsutils
-    unixtools.watch
-    gawk
-    parallel
-    jq
-    yq-go
-    rclone
-    restic
     sshuttle
-    socat
-    watchman
-    unrar
-    curlie
-    tealdeer
-    du-dust
     procs
-    dogdns
     gping
     rdfind
   ];

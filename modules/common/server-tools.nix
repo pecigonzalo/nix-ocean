@@ -7,19 +7,43 @@
   environment.systemPackages =
     with pkgs;
     map lib.lowPrio [
+      # Essential tools
       gitMinimal
-      neovim
       curl
+      wget
+      binutils
+      findutils
+      coreutils
+      # Disk tools
+      du-dust
+      # Networking tools
+      dnsutils
       dig
+      drill
+      ripgrep
       iftop
+      iotop-c
       iperf3
       mtr
       tcpdump
       traceroute
+      netcat-gnu
+      nmap
+      ngrep
+      socat
+      # Backup
+      restic
+      # Hardware info tools
       usbutils
       pciutils
       fastfetch
     ];
+
+  programs.neovim = {
+    enable = true;
+    viAlias = true;
+    vimAlias = true;
+  };
 
   programs.htop = {
     enable = true;
