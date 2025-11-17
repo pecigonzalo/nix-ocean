@@ -40,6 +40,7 @@
   };
 
   boot = {
+    swraid.enable = true;
     loader = {
       systemd-boot.enable = false;
       efi.canTouchEfiVariables = false;

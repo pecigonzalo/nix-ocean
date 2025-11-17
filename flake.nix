@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
+
     # Secrets repository (separate git repo)
     secrets = {
       url = "git+ssh://git@github.com/pecigonzalo/nix-ocean-secrets";
