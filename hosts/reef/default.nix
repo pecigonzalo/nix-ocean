@@ -7,6 +7,7 @@
     ../../modules/common/base.nix
     ../../modules/common/performance.nix
     ../../modules/common/users.nix
-    ../../modules/roles/reef-node.nix
+    ../../modules/roles/n150.nix
+    ../../modules/roles/reefNode.nix
   ];
 }

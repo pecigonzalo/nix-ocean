@@ -1,4 +1,10 @@
-{ lib, pkgs, secrets, config, ... }:
+{
+  lib,
+  pkgs,
+  secrets,
+  config,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -14,15 +20,25 @@
 
   networking.hostName = "manta";
 
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/e3d3f7e9-f687-4bf3-a272-fc64bf7835b2";
+    fsType = "ext4";
+  };
+
+  fileSystems."/data" = {
+    device = "/dev/disk/by-uuid/72099223-8129-47b2-b56f-7e8ed76f6024";
+    fsType = "ext4";
+  };
+
+  zramSwap.enable = true;
+  swapDevices = [ ];
+
   age.secrets.tailscale-key = {
     file = "${secrets}/tailscale-manta.age";
     owner = "root";
     group = "root";
     mode = "400";
   };
-
-  # Keep the server on its long-term state version until we explicitly upgrade
-  system.stateVersion = lib.mkForce "22.05";
 
   boot = {
     initrd.kernelModules = [ "i915" ];
@@ -54,22 +70,26 @@
     };
   };
 
-  powerManagement.cpuFreqGovernor = lib.mkForce "ondemand";
-
-  # Force grub on BIOS Hetzner host instead of the default systemd-boot setup
-  boot.loader = {
-    systemd-boot.enable = lib.mkForce false;
-    efi.canTouchEfiVariables = lib.mkForce false;
-    grub = {
-      enable = true;
-      efiSupport = false;
-      devices = [
+  ocean = {
+    boot = {
+      loader = "grub";
+      efiCanTouchVariables = false;
+      grubDevices = [
         "/dev/sda"
         "/dev/sdb"
         "/dev/sdc"
         "/dev/sdd"
       ];
+      grubEfiSupport = false;
     };
+
+    nix = {
+      gcSchedule = "12:50";
+      gcOptions = "--delete-older-than 15d";
+      optimiseSchedule = [ "12:20" ];
+    };
+
+    performance.cpuGovernor = "ondemand";
   };
 
   environment.variables.VDPAU_DRIVER = "va_gl";
@@ -126,15 +146,6 @@
       allowed-users = [ "@wheel" ];
       trusted-users = [ "@wheel" ];
       auto-optimise-store = true;
-    };
-    gc = {
-      automatic = true;
-      dates = lib.mkForce "12:50";
-      options = lib.mkForce "--delete-older-than 15d";
-    };
-    optimise = {
-      automatic = true;
-      dates = lib.mkForce [ "12:20" ];
     };
   };
 
@@ -208,4 +219,7 @@
     gping
     rdfind
   ];
+
+  # State version
+  system.stateVersion = "22.05";
 }

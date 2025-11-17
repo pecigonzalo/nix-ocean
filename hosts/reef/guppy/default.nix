@@ -2,7 +2,7 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../default.nix  # Common reef config
+    ../default.nix # Common reef config
   ];
 
   networking.hostName = "guppy";
@@ -16,4 +16,7 @@
       nameserver = [ "192.168.127.254" ];
     };
   };
+
+  # State version
+  system.stateVersion = "24.05";
 }

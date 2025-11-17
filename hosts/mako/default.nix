@@ -1,4 +1,9 @@
-{ modulesPath, config, secrets, ... }:
+{
+  modulesPath,
+  config,
+  secrets,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -7,6 +12,7 @@
     ../../modules/common/base.nix
     ../../modules/common/performance.nix
     ../../modules/common/users.nix
+    ../../modules/roles/n150.nix
     ../../modules/roles/router.nix
   ];
 
@@ -73,4 +79,7 @@
       };
     };
   };
+
+  # State version
+  system.stateVersion = "24.05";
 }
