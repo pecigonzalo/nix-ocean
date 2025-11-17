@@ -11,12 +11,12 @@
   imports = [
     ./hardware-configuration.nix
     (modulesPath + "/installer/scan/not-detected.nix")
-    ../../modules/common/disko.nix
     ../../modules/common/base.nix
     ../../modules/common/performance.nix
+    ../../modules/common/server-tools.nix
     ../../modules/common/users.nix
-    ../../modules/roles/n150.nix
-    ../../modules/roles/router.nix
+    ../../modules/roles/n150
+    ../../modules/roles/router
   ];
 
   networking.hostName = "mako";

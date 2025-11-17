@@ -2,6 +2,10 @@
   ...
 }:
 {
+  imports = [
+    ./disko.nix
+  ];
+
   hardware.ksm = {
     enable = true;
     sleep = 20;

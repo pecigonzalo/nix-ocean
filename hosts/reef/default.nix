@@ -5,11 +5,11 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    ../../modules/common/disko.nix
     ../../modules/common/base.nix
     ../../modules/common/performance.nix
+    ../../modules/common/server-tools.nix
     ../../modules/common/users.nix
-    ../../modules/roles/n150.nix
+    ../../modules/roles/n150
     ../../modules/roles/reefNode.nix
   ];
 }
