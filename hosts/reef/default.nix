@@ -10,6 +10,6 @@
     ../../modules/common/server-tools.nix
     ../../modules/common/users.nix
     ../../modules/roles/n150
-    ../../modules/roles/reefNode
+    ../../modules/roles/reef-node
   ];
 }
