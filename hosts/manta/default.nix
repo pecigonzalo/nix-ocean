@@ -1,3 +1,6 @@
+# NixOS configuration for the "manta" host
+# manta: Personal server hosted in Hetzner
+# hardware: Intel i7-3770, 32GB, 4x6TB HDD
 {
   lib,
   pkgs,

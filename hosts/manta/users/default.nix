@@ -1,5 +1,7 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+{
   imports = [
+    ../../../modules/common/users.nix
     ./pecigonzalo.nix
   ];
 
@@ -7,11 +9,12 @@
     enable = true;
     wheelNeedsPassword = false;
   };
-  programs.ssh = {
-    startAgent = true;
-  };
-  users = rec {
+
+  programs.ssh.startAgent = true;
+
+  users = {
     mutableUsers = false;
+
     groups.media = {
       name = "media";
       gid = 995;
@@ -21,22 +24,19 @@
       gid = 996;
     };
 
-    users = {
-      root.openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIcvgNOfkvVYVzwgBVc5nEUoP6Sz7WkuCIPvs4d4WyLk pecigonzalo"
-      ];
-      media = {
-        uid = 995;
-        isSystemUser = true;
-        group = groups.media.name;
-      };
-      wordpress = {
-        uid = 996;
-        isSystemUser = true;
-        group = groups.wordpress.name;
-      };
+    users.media = {
+      uid = 995;
+      isSystemUser = true;
+      group = "media";
+    };
+
+    users.wordpress = {
+      uid = 996;
+      isSystemUser = true;
+      group = "wordpress";
     };
   };
+
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
 }

@@ -1,3 +1,6 @@
+# NixOS configuration for the "mako" router device
+# mako: Router and home server
+# hardware: Intel N150, 12GB, 512GB SSD
 {
   modulesPath,
   config,

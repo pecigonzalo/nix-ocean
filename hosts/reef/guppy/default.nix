@@ -1,3 +1,4 @@
+# NixOS configuration for reef beta node
 { ... }:
 {
   imports = [

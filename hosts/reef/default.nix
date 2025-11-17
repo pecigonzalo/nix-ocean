@@ -1,4 +1,6 @@
 # Common configuration for all reef cluster nodes
+# reef: Reef cluste nodes
+# hardware: Intel N150, 12GB, 512GB SSD
 { modulesPath, ... }:
 {
   imports = [
