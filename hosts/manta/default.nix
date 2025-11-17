@@ -55,11 +55,6 @@
       };
     };
     initrd.kernelModules = [ "i915" ];
-    kernelParams = [
-      "acpi_osi=Linux"
-      "acpi=force"
-      "acpi_enforce_resources=lax"
-    ];
     binfmt.emulatedSystems = [ "aarch64-linux" ];
     swraid.mdadmConf = ''
       HOMEHOST <ignore>
