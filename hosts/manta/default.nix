@@ -92,14 +92,14 @@
 
   environment.variables.VDPAU_DRIVER = "va_gl";
 
-  programs.fish.enable = true;
-
   environment.systemPackages = with pkgs; [
     sshuttle
     procs
     gping
     rdfind
   ];
+
+  programs.fish.enable = true;
 
   # State version
   system.stateVersion = "25.05";
