@@ -79,6 +79,7 @@
       intel-media-driver
     ];
   };
+  environment.variables.VDPAU_DRIVER = "va_gl";
 
   ocean = {
     nix = {
@@ -89,8 +90,6 @@
 
     performance.cpuGovernor = "ondemand";
   };
-
-  environment.variables.VDPAU_DRIVER = "va_gl";
 
   environment.systemPackages = with pkgs; [
     sshuttle
