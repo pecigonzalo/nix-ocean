@@ -20,7 +20,6 @@
           "${mongoInit}:/docker-entrypoint-initdb.d/init-mongo.js:ro"
         ];
         extraOptions = [
-          "--pull=always"
           "--network=proxy"
           "--memory=512M"
         ];
@@ -31,7 +30,7 @@
       port = 8443;
       host = "control";
       container = {
-        image = "ghcr.io/linuxserver/unifi-network-application:9.4.19";
+        image = "ghcr.io/linuxserver/unifi-network-application:9.5.21";
         environment = {
           PUID = "1000";
           PGID = "1000";
