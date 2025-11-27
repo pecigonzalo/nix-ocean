@@ -1,13 +1,26 @@
-{ ... }:
+{ secrets, ... }:
 {
   imports = [
     ./hardware-configuration.nix
-    ../default.nix  # Common reef config
+    ../default.nix # Common reef config
   ];
 
   networking.hostName = "beta";
 
+  age.secrets = {
+    wifi-password = {
+      file = "${secrets}/wifi-password.age";
+      owner = "root";
+      group = "root";
+      mode = "400";
+    };
+  };
+
   reefNode = {
+    wlan = {
+      ssid = "DavyJones IoT";
+      nmEnvironmentFile = "${secrets}/wifi-password.age";
+    };
     lan = {
       mac = "e0:51:d8:1b:dd:07";
       address = "192.168.127.10";

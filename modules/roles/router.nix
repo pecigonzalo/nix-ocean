@@ -38,23 +38,19 @@
         };
       };
       tailscale = {
-        authKey = lib.mkOption {
-          type = lib.types.str;
-          description = "Tailscale auth key";
-        };
         routes = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Routes to advertise";
         };
+        authKeyFile = lib.mkOption {
+          type = lib.types.path;
+          description = "Path to Tailscale auth key file";
+        };
       };
       services = {
         pihole = {
           enable = lib.mkEnableOption "Pi-hole DNS and DHCP server";
-          password = lib.mkOption {
-            type = lib.types.str;
-            description = "Pi-hole web interface password";
-          };
           dhcpRange = {
             start = lib.mkOption {
               type = lib.types.str;
@@ -79,6 +75,10 @@
             type = lib.types.str;
             default = "1.1.1.1;8.8.8.8";
             description = "Upstream DNS servers";
+          };
+          secretsFile = lib.mkOption {
+            type = lib.types.path;
+            description = "Path to secrets file to mount in pihole";
           };
         };
         homeAssistant = {
@@ -225,11 +225,13 @@
           exit 0
         fi
 
+        AUTHKEY="$(cat ${config.router.tailscale.authKeyFile})"
+
         # Not running or not configured, connect with all settings
         # Note: This will fail if the auth key has already been used
         # In that case, manual intervention is needed or use a reusable key
         echo "Tailscale is running but not fully configured, will reconfigure..."
-        ${tailscale}/bin/tailscale up --authkey ${config.router.tailscale.authKey} ${lib.concatStringsSep " " config.services.tailscale.extraSetFlags} || {
+        ${tailscale}/bin/tailscale up --authkey "$AUTHKEY" ${lib.concatStringsSep " " config.services.tailscale.extraSetFlags} || {
           echo "Failed to connect. If auth key expired, update config with new key or use 'tailscale up' manually."
           exit 1
         }
@@ -275,6 +277,9 @@
       extraOptions = [ "--memory=256m" ];
       networks = [ "host" ];
       privileged = true;
+      environmentFiles = [
+        config.router.services.pihole.secretsFile
+      ];
       environment = {
         FTLCONF_webserver_api_password = config.router.services.pihole.password;
         FTLCONF_dns_blocking_mode = "NODATA";

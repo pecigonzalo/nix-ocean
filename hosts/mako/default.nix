@@ -1,4 +1,8 @@
-{ modulesPath, config, secrets, ... }:
+{
+  modulesPath,
+  secrets,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -14,14 +18,14 @@
 
   # Agenix secrets from separate repository
   age.secrets = {
-    tailscale-key = {
-      file = "${secrets}/tailscale-mako.age";
+    tailscale = {
+      file = "${secrets}/tailscale.age";
       owner = "root";
       group = "root";
       mode = "400";
     };
-    pihole-password = {
-      file = "${secrets}/pihole-password.age";
+    pihole = {
+      file = "${secrets}/pihole.age";
       owner = "root";
       group = "root";
       mode = "400";
@@ -47,7 +51,6 @@
     services = {
       pihole = {
         enable = true;
-        password = "ABC123abc!";
         dhcpRange = {
           start = "192.168.127.100";
           end = "192.168.127.200";
