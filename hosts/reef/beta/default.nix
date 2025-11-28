@@ -1,4 +1,4 @@
-{ secrets, ... }:
+{ secrets, config, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -19,7 +19,7 @@
   reefNode = {
     wlan = {
       ssid = "DavyJones IoT";
-      nmEnvironmentFile = "${secrets}/wifi-password.age";
+      nmEnvironmentFile = config.age.secrets.wifi-password.path;
     };
     lan = {
       mac = "e0:51:d8:1b:dd:07";

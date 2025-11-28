@@ -1,6 +1,7 @@
 {
   modulesPath,
   secrets,
+  config,
   ...
 }:
 {
@@ -45,12 +46,13 @@
       prefixLength = 24;
     };
     tailscale = {
-      authKey = "tskey-auth-k4tpnX4K9y11CNTRL-FFmGQ3TYKpYqBpJSQ8CbvYC4HSu3rvZAj";
+      authKeyFile = config.age.secrets.tailscale.path;
       routes = [ "192.168.127.0/24" ];
     };
     services = {
       pihole = {
         enable = true;
+        secretsFile = config.age.secrets.pihole.path;
         dhcpRange = {
           start = "192.168.127.100";
           end = "192.168.127.200";

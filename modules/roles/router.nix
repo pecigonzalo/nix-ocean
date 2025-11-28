@@ -281,7 +281,6 @@
         config.router.services.pihole.secretsFile
       ];
       environment = {
-        FTLCONF_webserver_api_password = config.router.services.pihole.password;
         FTLCONF_dns_blocking_mode = "NODATA";
         FTLCONF_dns_interface = "lan";
         FTLCONF_dns_listeningMode = "LOCAL";
