@@ -7,6 +7,16 @@
 {
   options = {
     reefNode = {
+      wlan = {
+        ssid = lib.mkOption {
+          type = lib.types.str;
+          description = "WAN WiFi SSID";
+        };
+        nmEnvironmentFile = lib.mkOption {
+          type = lib.types.path;
+          description = "Path to environment file for nmcli (e.g. containing WiFi password)";
+        };
+      };
       lan = {
         mac = lib.mkOption {
           type = lib.types.str;
@@ -78,7 +88,7 @@
         [ -n "$WLAN_IP" ] && break
         sleep 1
       done
-      
+
       if [ -n "$WLAN_IP" ]; then
         # Use a custom routing table that prefers wlan0's default route
         ip rule add from $WLAN_IP table 100 priority 100 2>/dev/null || true
@@ -91,28 +101,32 @@
     '';
 
     # Ensure WiFi auto-connects on boot
-    networking.networkmanager.ensureProfiles.profiles = {
-      wifi-failover = {
-        connection = {
-          id = "wifi-failover";
-          type = "wifi";
-          interface-name = "wlan0";
-          autoconnect = true;
-        };
-        wifi = {
-          mode = "infrastructure";
-          ssid = "DavyJones IoT";
-        };
-        ipv4 = {
-          method = "auto"; # DHCP
-        };
-        ipv6 = {
-          method = "disabled";
-        };
-        wifi-security = {
-          key-mgmt = "wpa-psk";
-          # Password must be set manually once via: nmcli connection modify wifi-failover wifi-sec.psk '<your-password>'
-          # It persists in /etc/NetworkManager/system-connections/
+    networking.networkmanager.ensureProfiles = {
+      environmentFiles = [
+        config.reefNode.wlan.nmEnvironmentFile
+      ];
+      profiles = {
+        wifi-failover = {
+          connection = {
+            id = "wifi-failover";
+            type = "wifi";
+            interface-name = "wlan0";
+            autoconnect = true;
+          };
+          wifi = {
+            mode = "infrastructure";
+            ssid = config.reefNode.wlan.ssid;
+          };
+          ipv4 = {
+            method = "auto"; # DHCP
+          };
+          ipv6 = {
+            method = "disabled";
+          };
+          wifi-security = {
+            key-mgmt = "wpa-psk";
+            psk = "$WIFI_PASSWORD";
+          };
         };
       };
     };

@@ -42,23 +42,19 @@
         };
       };
       tailscale = {
-        authKey = lib.mkOption {
-          type = lib.types.str;
-          description = "Tailscale auth key";
-        };
         routes = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];
           description = "Routes to advertise";
         };
+        authKeyFile = lib.mkOption {
+          type = lib.types.path;
+          description = "Path to Tailscale auth key file";
+        };
       };
       services = {
         pihole = {
           enable = lib.mkEnableOption "Pi-hole DNS and DHCP server";
-          password = lib.mkOption {
-            type = lib.types.str;
-            description = "Pi-hole web interface password";
-          };
           dhcpRange = {
             start = lib.mkOption {
               type = lib.types.str;
@@ -83,6 +79,10 @@
             type = lib.types.str;
             default = "1.1.1.1;8.8.8.8";
             description = "Upstream DNS servers";
+          };
+          secretsFile = lib.mkOption {
+            type = lib.types.path;
+            description = "Path to secrets file to mount in pihole";
           };
         };
         homeAssistant = {

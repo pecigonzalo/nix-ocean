@@ -41,8 +41,10 @@
         exit 0
       fi
 
+      AUTHKEY="$(cat ${config.router.tailscale.authKeyFile})"
+
       echo "Tailscale is running but not fully configured, will reconfigure..."
-      ${tailscale}/bin/tailscale up --authkey ${config.router.tailscale.authKey} ${lib.concatStringsSep " " config.services.tailscale.extraSetFlags} || {
+      ${tailscale}/bin/tailscale up --authkey "$AUTHKEY" ${lib.concatStringsSep " " config.services.tailscale.extraSetFlags} || {
         echo "Failed to connect. If auth key expired, update config with new key or use 'tailscale up' manually."
         exit 1
       }
