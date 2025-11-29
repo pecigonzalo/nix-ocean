@@ -13,7 +13,7 @@ let
         rule = "Host(`ha.munin.xyz`)";
       };
       services.ha.loadBalancer.servers = [
-        { url = "http://100.126.4.123:8123"; }
+        { url = "http://100.112.15.102:8123"; }
       ];
     };
   };
