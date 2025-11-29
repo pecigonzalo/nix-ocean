@@ -68,20 +68,41 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "agenix",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1745494811,
-        "narHash": "sha256-YZCh2o9Ua1n9uCvrvi5pRxtuVNml8X2a03qIFfRKpFs=",
+        "lastModified": 1758463745,
+        "narHash": "sha256-uhzsV0Q0I9j2y/rfweWeGif5AWe0MGrgZ/3TjpDYdGA=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "abfad3d2958c9e6300a883bd443512c55dfeb1be",
+        "rev": "3b955f5f0a942f9f60cdc9cacb7844335d0f21c3",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
+        "ref": "release-25.05",
+        "repo": "home-manager",
+        "type": "github"
+      }
+    },
+    "home-manager_2": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1758463745,
+        "narHash": "sha256-uhzsV0Q0I9j2y/rfweWeGif5AWe0MGrgZ/3TjpDYdGA=",
+        "owner": "nix-community",
+        "repo": "home-manager",
+        "rev": "3b955f5f0a942f9f60cdc9cacb7844335d0f21c3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "release-25.05",
         "repo": "home-manager",
         "type": "github"
       }
@@ -106,6 +127,7 @@
       "inputs": {
         "agenix": "agenix",
         "disko": "disko",
+        "home-manager": "home-manager_2",
         "nixpkgs": "nixpkgs",
         "secrets": "secrets"
       }
@@ -113,11 +135,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1763122444,
-        "narHash": "sha256-T1+cv94kdjdphCJZ86l9PauzBbx8Ki8xYjRBttQgnk4=",
+        "lastModified": 1764456341,
+        "narHash": "sha256-3wnp5iaGB6Or4/HALU7j2KbPbtkY5BoMwSPerHnQ3fU=",
         "ref": "refs/heads/main",
-        "rev": "4a9ebf86901828de1b44a77cd7892ee5a6f2f03c",
-        "revCount": 3,
+        "rev": "f0364d01d4f3e03e9a72d6755d3f667f7e2a5d1f",
+        "revCount": 13,
         "type": "git",
         "url": "ssh://git@github.com/pecigonzalo/nix-ocean-secrets"
       },

@@ -1,8 +1,9 @@
+# NixOS configuration for reef beta node
 { ... }:
 {
   imports = [
     ./hardware-configuration.nix
-    ../default.nix  # Common reef config
+    ../default.nix # Common reef config
   ];
 
   networking.hostName = "tetra";
@@ -16,4 +17,7 @@
       nameserver = [ "192.168.127.254" ];
     };
   };
+
+  # State version
+  system.stateVersion = "24.05";
 }

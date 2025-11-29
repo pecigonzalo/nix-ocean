@@ -1,27 +1,34 @@
-{ modulesPath, config, secrets, ... }:
+# NixOS configuration for the "mako" router device
+# mako: Router and home server
+# hardware: Intel N150, 12GB, 512GB SSD
+{
+  secrets,
+  config,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
-    (modulesPath + "/installer/scan/not-detected.nix")
-    ../../modules/common/disko.nix
     ../../modules/common/base.nix
     ../../modules/common/performance.nix
+    ../../modules/common/server-tools.nix
     ../../modules/common/users.nix
-    ../../modules/roles/router.nix
+    ../../modules/roles/n150
+    ../../modules/roles/router
   ];
 
   networking.hostName = "mako";
 
   # Agenix secrets from separate repository
   age.secrets = {
-    tailscale-key = {
-      file = "${secrets}/tailscale-mako.age";
+    tailscale = {
+      file = "${secrets}/tailscale.age";
       owner = "root";
       group = "root";
       mode = "400";
     };
-    pihole-password = {
-      file = "${secrets}/pihole-password.age";
+    pihole = {
+      file = "${secrets}/pihole.age";
       owner = "root";
       group = "root";
       mode = "400";
@@ -41,13 +48,13 @@
       prefixLength = 24;
     };
     tailscale = {
-      authKey = "tskey-auth-k4tpnX4K9y11CNTRL-FFmGQ3TYKpYqBpJSQ8CbvYC4HSu3rvZAj";
+      authKeyFile = config.age.secrets.tailscale.path;
       routes = [ "192.168.127.0/24" ];
     };
     services = {
       pihole = {
         enable = true;
-        password = "ABC123abc!";
+        secretsFile = config.age.secrets.pihole.path;
         dhcpRange = {
           start = "192.168.127.100";
           end = "192.168.127.200";
@@ -73,4 +80,7 @@
       };
     };
   };
+
+  # State version
+  system.stateVersion = "24.05";
 }
