@@ -32,8 +32,8 @@
     fsType = "ext4";
   };
 
-  age.secrets.tailscale-key = {
-    file = "${secrets}/tailscale-manta.age";
+  age.secrets.tailscale = {
+    file = "${secrets}/tailscale.age";
     owner = "root";
     group = "root";
     mode = "400";

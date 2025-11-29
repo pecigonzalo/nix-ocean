@@ -1,4 +1,5 @@
-{ config, ... }: {
+{ config, ... }:
+{
   systemd.network = {
     enable = true;
     networks = {
@@ -53,6 +54,6 @@
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "server";
-    authKeyFile = config.age.secrets.tailscale-key.path;
+    authKeyFile = config.age.secrets.tailscale.path;
   };
 }
