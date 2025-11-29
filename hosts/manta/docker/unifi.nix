@@ -30,7 +30,7 @@
       port = 8443;
       host = "control";
       container = {
-        image = "ghcr.io/linuxserver/unifi-network-application:9.5.21";
+        image = "ghcr.io/linuxserver/unifi-network-application:10.0.160";
         environment = {
           PUID = "1000";
           PGID = "1000";
