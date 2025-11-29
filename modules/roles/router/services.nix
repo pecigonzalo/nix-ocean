@@ -44,12 +44,13 @@
       config.router.services.pihole.secretsFile
     ];
     environment = {
+      FTLCONF_dns_upstreams = config.router.services.pihole.upstreams;
       FTLCONF_dns_blocking_mode = "NODATA";
       FTLCONF_dns_interface = "lan";
       FTLCONF_dns_listeningMode = "ALL";
-      FTLCONF_dns_upstreams = config.router.services.pihole.upstreams;
       FTLCONF_dns_bogusPriv = "true";
       FTLCONF_dns_domainNeeded = "true";
+      FTLCONF_dns_expandHosts = "true";
       FTLCONF_dns_hosts = lib.concatStringsSep ";" config.router.services.pihole.dnsHosts;
       FTLCONF_dhcp_active = "true";
       FTLCONF_dhcp_ipv6 = "true";
