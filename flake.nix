@@ -93,6 +93,17 @@
               ''
             );
           };
+          "test-${name}" = {
+            type = "app";
+            program = toString (
+              pkgs.writeShellScript "test-${name}" ''
+                exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng test \
+                  --flake ".#${name}" \
+                  --target-host "root@${name}" \
+                  --build-host "root@${name}"
+              ''
+            );
+          };
           "build-${name}" = {
             type = "app";
             program = toString (
