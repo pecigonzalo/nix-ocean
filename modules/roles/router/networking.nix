@@ -5,7 +5,6 @@
 {
   # Load required kernel modules
   boot.kernelModules = [
-    "tcp_bbr"
     "nf_conntrack"
   ];
 
@@ -31,7 +30,6 @@
     "net.core.default_qdisc" = "fq_codel";
     "net.ipv4.tcp_congestion_control" = "bbr";
     "net.ipv4.tcp_fin_timeout" = 15;
-    "net.ipv4.tcp_tw_reuse" = 0;
     "net.ipv4.neigh.default.gc_thresh1" = 1024;
     "net.ipv4.neigh.default.gc_thresh2" = 2048;
     "net.ipv4.neigh.default.gc_thresh3" = 4096;

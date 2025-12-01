@@ -11,6 +11,9 @@
         dockerCompat = true;
       };
 
+  # Firewall rules for router services
+  # Note: lan and tailscale0 are already in trustedInterfaces (networking.nix)
+  # so these rules are redundant but kept for explicitness
   networking.firewall.interfaces.lan.allowedTCPPorts =
     (lib.optionals config.router.services.pihole.enable [ 80 ])
     ++ (lib.optionals config.router.services.homeAssistant.enable [ 8123 ]);
