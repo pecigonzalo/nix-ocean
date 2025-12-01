@@ -18,8 +18,7 @@
       du-dust
       # Networking tools
       dnsutils
-      dig
-      drill
+      ldns # drill
       ripgrep
       iftop
       iotop-c
