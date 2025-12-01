@@ -1,5 +1,5 @@
 # Common configuration for all reef cluster nodes
-# reef: Reef cluste nodes
+# reef: Reef cluster nodes
 # hardware: Intel N150, 12GB, 512GB SSD
 { secrets, config, ... }:
 {
@@ -12,19 +12,18 @@
     ../../modules/roles/reef-node
   ];
 
-  age.secrets = {
-    wifi-password = {
-      file = "${secrets}/wifi-password.age";
-      owner = "root";
-      group = "root";
-      mode = "400";
-    };
+  # Agenix secret for iwd wireless configuration
+  age.secrets.iwd-davyjones-iot = {
+    file = "${secrets}/iwd-davyjones-iot.age";
+    owner = "root";
+    group = "root";
+    mode = "0600";
   };
 
   reefNode = {
     wlan = {
       ssid = "DavyJones IoT";
-      nmEnvironmentFile = config.age.secrets.wifi-password.path;
+      pskFile = config.age.secrets.iwd-davyjones-iot.path;
     };
   };
 }

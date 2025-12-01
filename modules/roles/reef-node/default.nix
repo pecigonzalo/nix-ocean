@@ -5,26 +5,46 @@
   ...
 }:
 {
+  imports = [
+    ./networking.nix
+  ];
+
   options = {
     reefNode = {
       wlan = {
+        mac = lib.mkOption {
+          type = lib.types.str;
+          description = "WAN WiFi interface MAC address";
+          example = "e0:51:d8:1b:dd:08";
+        };
         ssid = lib.mkOption {
           type = lib.types.str;
           description = "WAN WiFi SSID";
+          example = "MyNetwork";
         };
-        nmEnvironmentFile = lib.mkOption {
+        pskFile = lib.mkOption {
           type = lib.types.path;
-          description = "Path to environment file for nmcli (e.g. containing WiFi password)";
+          description = ''
+            Path to iwd PSK configuration file.
+            Should be in iwd's PSK format:
+            [Security]
+            Passphrase=your-wifi-password
+
+            Typically provided via agenix secret path.
+          '';
+          example = "/run/agenix/iwd-network";
         };
       };
       lan = {
         mac = lib.mkOption {
           type = lib.types.str;
           description = "LAN interface MAC address";
+          example = "e0:51:d8:1b:dd:07";
         };
         address = lib.mkOption {
           type = lib.types.str;
           description = "LAN IP address";
+          example = "192.168.127.10";
         };
         prefixLength = lib.mkOption {
           type = lib.types.int;
@@ -34,103 +54,22 @@
         defaultGateway = lib.mkOption {
           type = lib.types.str;
           description = "LAN default gateway";
+          example = "192.168.127.254";
         };
         nameserver = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          description = "LAN nameserver";
+          description = "LAN nameserver(s)";
+          example = [ "192.168.127.254" ];
         };
       };
     };
   };
+
   config = {
-    systemd.network.links."10-lan" = {
-      matchConfig.PermanentMACAddress = config.reefNode.lan.mac;
-      linkConfig.Name = "lan";
-    };
-
-    networking = {
-      networkmanager.enable = true;
-      networkmanager.wifi.backend = "iwd";
-
-      interfaces.lan.ipv4.addresses = [
-        {
-          address = config.reefNode.lan.address;
-          prefixLength = config.reefNode.lan.prefixLength;
-        }
-      ];
-      defaultGateway = config.reefNode.lan.defaultGateway;
-      nameservers = config.reefNode.lan.nameserver;
-
-      firewall = {
-        enable = true;
-        checkReversePath = "loose"; # Allow asymmetric routing
-        trustedInterfaces = [
-          "lan"
-          "wlan0"
-        ];
-        allowedTCPPorts = [ 22 ];
-        allowPing = true;
-      };
-    };
-
-    # Fix for dual-homing on same subnet (lan + wlan0)
-    boot.kernel.sysctl = {
-      # Ensure wlan0 responds with correct source IP in ARP
-      "net.ipv4.conf.wlan0.arp_announce" = 2;
-      "net.ipv4.conf.wlan0.arp_ignore" = 1;
-    };
-
-    # Policy routing: ensure replies from wlan0 IP exit via wlan0
-    networking.localCommands = ''
-      # Wait for wlan0 to get IP via DHCP
-      for i in {1..30}; do
-        WLAN_IP=$(ip -4 addr show wlan0 2>/dev/null | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)
-        [ -n "$WLAN_IP" ] && break
-        sleep 1
-      done
-
-      if [ -n "$WLAN_IP" ]; then
-        # Use a custom routing table that prefers wlan0's default route
-        ip rule add from $WLAN_IP table 100 priority 100 2>/dev/null || true
-        # Copy wlan0's routes to table 100
-        ip route show dev wlan0 | while read route; do
-          ip route add $route table 100 2>/dev/null || true
-        done
-        ip route flush cache
-      fi
-    '';
-
-    # Ensure WiFi auto-connects on boot
-    networking.networkmanager.ensureProfiles = {
-      environmentFiles = [
-        config.reefNode.wlan.nmEnvironmentFile
-      ];
-      profiles = {
-        wifi-failover = {
-          connection = {
-            id = "wifi-failover";
-            type = "wifi";
-            interface-name = "wlan0";
-            autoconnect = true;
-          };
-          wifi = {
-            mode = "infrastructure";
-            ssid = config.reefNode.wlan.ssid;
-          };
-          ipv4 = {
-            method = "auto"; # DHCP
-          };
-          ipv6 = {
-            method = "disabled";
-          };
-          wifi-security = {
-            key-mgmt = "wpa-psk";
-            psk = "$WIFI_PASSWORD";
-          };
-        };
-      };
-    };
-
-    environment.systemPackages = [ pkgs.tailscale ];
+    environment.systemPackages = with pkgs; [
+      tailscale
+      iw
+      wirelesstools
+    ];
   };
 }

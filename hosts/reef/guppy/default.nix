@@ -9,6 +9,9 @@
   networking.hostName = "guppy";
 
   reefNode = {
+    wlan = {
+      mac = "4c:44:5b:89:2e:b1";
+    };
     lan = {
       mac = "e0:51:d8:1a:94:f6";
       address = "192.168.127.11";
