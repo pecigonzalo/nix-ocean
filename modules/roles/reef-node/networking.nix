@@ -51,6 +51,7 @@
     networkConfig = {
       DHCP = "no";
       IPv6AcceptRA = false;
+      Domains = "local"; # Allow resolving .local domains via DNS
     };
     routes = [
       {

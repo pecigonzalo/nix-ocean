@@ -21,6 +21,8 @@
     };
   };
 
-  # State version
+  # k3s cluster: beta is the init node
+  reefNode.cluster.isInitNode = true;
+
   system.stateVersion = "24.05";
 }

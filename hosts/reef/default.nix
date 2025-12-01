@@ -12,7 +12,7 @@
     ../../modules/roles/reef-node
   ];
 
-  # Agenix secret for iwd wireless configuration
+  # Agenix secrets
   age.secrets.iwd-davyjones-iot = {
     file = "${secrets}/iwd-davyjones-iot.age";
     owner = "root";
@@ -20,10 +20,22 @@
     mode = "0600";
   };
 
-  reefNode = {
-    wlan = {
-      ssid = "DavyJones IoT";
-      pskFile = config.age.secrets.iwd-davyjones-iot.path;
-    };
+  age.secrets.k3s-token = {
+    file = "${secrets}/k3s-token.age";
+    owner = "root";
+    group = "root";
+    mode = "0600";
+  };
+
+  # Wireless configuration
+  reefNode.wlan = {
+    ssid = "DavyJones IoT";
+    pskFile = config.age.secrets.iwd-davyjones-iot.path;
+  };
+
+  # k3s cluster configuration
+  reefNode.cluster = {
+    enable = true;
+    tokenFile = config.age.secrets.k3s-token.path;
   };
 }
