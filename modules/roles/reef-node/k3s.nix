@@ -113,50 +113,6 @@
             };
           };
         };
-        podinfo = {
-          target = "podinfo.yaml";
-          content = {
-            apiVersion = "helm.cattle.io/v1";
-            kind = "HelmChart";
-            metadata = {
-              name = "podinfo";
-              namespace = "default";
-            };
-            spec = {
-              chart = "podinfo";
-              repo = "https://stefanprodan.github.io/podinfo";
-              version = "6.9.3";
-              valuesContent = builtins.toJSON {
-                replicaCount = 2;
-                ingress = {
-                  enabled = true;
-                  annotations = {
-                    "traefik.ingress.kubernetes.io/router.middlewares" = "default-stripprefix@kubernetescrd";
-                  };
-                  hosts = [
-                    {
-                      host = "podinfo.k3s.local";
-                      paths = [
-                        {
-                          path = "/";
-                          pathType = "ImplementationSpecific";
-                        }
-                      ];
-                    }
-                    {
-                      paths = [
-                        {
-                          path = "/podinfo";
-                          pathType = "ImplementationSpecific";
-                        }
-                      ];
-                    }
-                  ];
-                };
-              };
-            };
-          };
-        };
       };
     };
 
