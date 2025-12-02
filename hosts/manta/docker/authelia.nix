@@ -16,7 +16,7 @@ let
       };
       juliberas = {
         displayname = "Julieta";
-        password = "$argon2id$v=19$m=1048576,t=1,p=8$WllhNm16dTVxQkVmMlRUZw$5xUHIZ0UhGL5AA3dzI7hPytMtJgBG3ucYTK9q5Yij80";
+        password = "$argon2id$v=19$m=65536,t=3,p=4$kjRe16hnpSmOFWnIOpoHXw$cDZmVCifihhOm0Q1xlQlV/J9+W6lXjc3RYdatp5Zxh0";
         email = "juliberas@outlook.com";
         groups = [ "users" ];
       };
