@@ -51,6 +51,10 @@
   config = lib.mkIf config.reefNode.cluster.enable {
     services.k3s = {
       enable = true;
+      gracefulNodeShutdown = {
+        enable = true;
+        timeout = 120;
+      };
       role = "server";
       tokenFile = config.reefNode.cluster.tokenFile;
       serverAddr = lib.mkIf (!config.reefNode.cluster.isInitNode) config.reefNode.cluster.initNodeAddr;
