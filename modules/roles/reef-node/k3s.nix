@@ -53,8 +53,8 @@
       enable = true;
       gracefulNodeShutdown = {
         enable = true;
-        shutdownGracePeriod = "5m";
-        shutdownGracePeriodCriticalPods = "1m";
+        shutdownGracePeriod = "10m";
+        shutdownGracePeriodCriticalPods = "5m";
       };
       role = "server";
       tokenFile = config.reefNode.cluster.tokenFile;
