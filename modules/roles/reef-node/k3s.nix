@@ -66,9 +66,98 @@
           "--tls-san=${config.networking.hostName}"
           "--tls-san=${config.networking.hostName}.local"
           "--tls-san=${config.reefNode.lan.address}"
+          "--tls-san=api.k3s.local"
         ]
         ++ (map (c: "--disable=${c}") config.reefNode.cluster.disableComponents)
       );
+
+      # WARN: Manifests are handled with tmpfile manager, they don't get removed until reboot
+      manifests = {
+        traefikConfig = {
+          target = "traefik-config.yaml";
+          content = {
+            apiVersion = "helm.cattle.io/v1";
+            kind = "HelmChartConfig";
+            metadata = {
+              name = "traefik";
+              namespace = "kube-system";
+            };
+            spec = {
+              valuesContent = builtins.toJSON {
+                additionalArguments = [
+                  "--api"
+                  "--api.dashboard=true"
+                  "--api.insecure=true"
+                ];
+                ingressRoute.dashboard = {
+                  enabled = true;
+                  entryPoints = [ "traefik" ];
+                };
+              };
+            };
+          };
+        };
+        traefikMiddlewareStripPrefix = {
+          target = "traefik-middleware-stripprefix.yaml";
+          content = {
+            apiVersion = "traefik.io/v1alpha1";
+            kind = "Middleware";
+            metadata = {
+              name = "stripprefix";
+              namespace = "default";
+            };
+            spec = {
+              stripPrefixRegex = {
+                regex = [ "^/[^/]+" ];
+              };
+            };
+          };
+        };
+        podinfo = {
+          target = "podinfo.yaml";
+          content = {
+            apiVersion = "helm.cattle.io/v1";
+            kind = "HelmChart";
+            metadata = {
+              name = "podinfo";
+              namespace = "default";
+            };
+            spec = {
+              chart = "podinfo";
+              repo = "https://stefanprodan.github.io/podinfo";
+              version = "6.9.3";
+              valuesContent = builtins.toJSON {
+                replicaCount = 2;
+                ingress = {
+                  enabled = true;
+                  annotations = {
+                    "traefik.ingress.kubernetes.io/router.middlewares" = "default-stripprefix@kubernetescrd";
+                  };
+                  hosts = [
+                    {
+                      host = "podinfo.k3s.local";
+                      paths = [
+                        {
+                          path = "/";
+                          pathType = "ImplementationSpecific";
+                        }
+                      ];
+                    }
+                    {
+                      paths = [
+                        {
+                          path = "/podinfo";
+                          pathType = "ImplementationSpecific";
+                        }
+                      ];
+                    }
+                  ];
+                };
+              };
+            };
+          };
+        };
+      };
     };
 
     networking.firewall = {
