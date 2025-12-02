@@ -89,15 +89,26 @@
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        mkCmd = (
-          name: ''
-            ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng \
-              --flake .#${name} \
-              --target-host root@${name} \
-              --build-host root@${name} \
-              {{.CLI_ARGS}}
-          ''
-        );
+        mkCmd = name: ''
+          ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng \
+            --flake .#${name} \
+            --target-host root@${name} \
+            --build-host root@${name} \
+            {{.CLI_ARGS}}
+        '';
+        taggedHosts = lib.foldl' (
+          acc: hostName:
+          let
+            hostTags = hosts.${hostName}.tags or [ ];
+          in
+          lib.foldl' (
+            innerAcc: tag:
+            innerAcc
+            // {
+              ${tag} = (innerAcc.${tag} or [ ]) ++ [ hostName ];
+            }
+          ) acc hostTags
+        ) { } (lib.attrNames hosts);
         taskfile = {
           version = "3";
           output = "prefixed";
@@ -108,22 +119,13 @@
             };
           }
           # Per tag group tasks
-          // lib.foldl' (
-            acc: hostName:
-            let
-              hostTags = hosts.${hostName}.tags;
-            in
-            lib.foldl' (
-              taskAcc: tag:
-              taskAcc
-              // {
-                "@${tag}" = {
-                  desc = "Deploy configuration to all ${tag} hosts";
-                  deps = taskAcc.${tag}.deps or [ ] ++ [ hostName ];
-                };
-              }
-            ) acc hostTags
-          ) { } (lib.attrNames hosts)
+          // lib.mapAttrs' (tag: hostNames: {
+            name = "@${tag}";
+            value = {
+              desc = "Deploy configuration to all ${tag} hosts";
+              deps = hostNames;
+            };
+          }) taggedHosts
           # Per host tasks
           // lib.mapAttrs (name: cfg: {
             desc = "Deploy configuration to ${name}";
@@ -132,17 +134,33 @@
             ];
           }) hosts;
         };
+        yamlFormat = pkgs.formats.yaml { };
+        taskfilePackage = pkgs.stdenv.mkDerivation {
+          name = "task";
+          taskfileYaml = yamlFormat.generate "Taskfile.yml" taskfile;
+          dontUnpack = true;
+          installPhase = ''
+            mkdir -p $out/share/taskfiles $out/bin
+            cp "$taskfileYaml" $out/share/taskfiles/Taskfile.yml
+            cat > $out/bin/task <<EOF
+              #!${pkgs.runtimeShell}
+              set -euo pipefail
+              exec ${pkgs.go-task}/bin/task --taskfile "$out/share/taskfiles/Taskfile.yml" "$@"
+            EOF
+            chmod +x $out/bin/task
+          '';
+        };
+        taskfileApp = {
+          type = "app";
+          program = "${taskfilePackage}/bin/task";
+        };
       in
       {
-        apps.taskfile = {
-          type = "app";
-          program = toString (
-            pkgs.writeShellScript "taskfile" ''
-              set -euo pipefail
-              echo '${builtins.toJSON taskfile}' | ${pkgs.jq}/bin/jq
-              exec ${pkgs.go-task}/bin/task -d ./ --taskfile <(echo '${builtins.toJSON taskfile}') "$@"
-            ''
-          );
+        packages = {
+          default = taskfilePackage;
+        };
+        apps = {
+          taskfile = taskfileApp;
         };
       }
     ));

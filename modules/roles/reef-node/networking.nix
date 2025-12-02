@@ -1,5 +1,4 @@
 {
-  pkgs,
   config,
   lib,
   ...
@@ -28,7 +27,9 @@
   # Symlink iwd network configuration
   # Escape spaces in SSID for tmpfiles (uses \x20 for spaces)
   systemd.tmpfiles.rules = [
-    "L+ /var/lib/iwd/${lib.replaceStrings [" "] ["\\x20"] config.reefNode.wlan.ssid}.psk - - - - ${config.reefNode.wlan.pskFile}"
+    "L+ /var/lib/iwd/${
+      lib.replaceStrings [ " " ] [ "\\x20" ] config.reefNode.wlan.ssid
+    }.psk - - - - ${config.reefNode.wlan.pskFile}"
   ];
 
   # Rename LAN interface based on MAC address

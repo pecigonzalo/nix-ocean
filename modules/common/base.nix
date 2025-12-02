@@ -1,11 +1,6 @@
 {
-  lib,
-  config,
   ...
 }:
-let
-  inherit (lib) mkIf mkOption types;
-in
 {
   imports = [
     ./nix.nix
