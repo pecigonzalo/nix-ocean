@@ -53,7 +53,6 @@
       enable = true;
       gracefulNodeShutdown = {
         enable = true;
-        timeout = 120;
       };
       role = "server";
       tokenFile = config.reefNode.cluster.tokenFile;
