@@ -1,14 +1,10 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    flake-utils.url = "github:numtide/flake-utils";
     disko.url = "github:nix-community/disko";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
     agenix.url = "github:ryantm/agenix";
-    agenix.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
 
     # Secrets repository (separate git repo)
     secrets = {
@@ -20,6 +16,7 @@
   outputs =
     {
       nixpkgs,
+      flake-utils,
       disko,
       agenix,
       home-manager,
@@ -27,109 +24,126 @@
       ...
     }:
     let
+      lib = nixpkgs.lib;
+
       # Host definitions - single source of truth
       hosts = {
         # Router
         mako = {
           path = "mako";
-          system = "x86_64-linux";
           modules = [ disko.nixosModules.disko ];
+          tags = [ "router" ];
         };
 
         # Cloud
         manta = {
           path = "manta";
-          system = "x86_64-linux";
           modules = [ home-manager.nixosModules.home-manager ];
+          tags = [ "cloud" ];
         };
 
         # Reef cluster nodes
         beta = {
           path = "reef/beta";
-          system = "x86_64-linux";
           modules = [ disko.nixosModules.disko ];
+          tags = [ "reef" ];
         };
         guppy = {
           path = "reef/guppy";
-          system = "x86_64-linux";
           modules = [ disko.nixosModules.disko ];
+          tags = [ "reef" ];
         };
         tetra = {
           path = "reef/tetra";
-          system = "x86_64-linux";
           modules = [ disko.nixosModules.disko ];
+          tags = [ "reef" ];
         };
 
       };
 
+      # Common modules for a host (used by both NixOS and Colmena)
+      hostModules =
+        name: cfg:
+        (cfg.modules or [ ])
+        ++ [
+          ./hosts/${cfg.path}
+          # Make agenix module and secrets available to all hosts
+          agenix.nixosModules.default
+        ];
+
       # Build a NixOS system configuration
       mkHost =
-        name: config:
-        nixpkgs.lib.nixosSystem {
-          system = config.system;
-          modules = (config.modules or [ ]) ++ [
-            ./hosts/${config.path}
-            # Make agenix module and secrets available to all hosts
-            agenix.nixosModules.default
-            { _module.args = { inherit secrets; }; }
-          ];
-        };
-
-      # Create deploy/build apps for a host
-      mkApps =
-        system: name:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          "deploy-${name}" = {
-            type = "app";
-            program = toString (
-              pkgs.writeShellScript "deploy-${name}" ''
-                exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng switch \
-                  --flake ".#${name}" \
-                  --target-host "root@${name}" \
-                  --build-host "root@${name}"
-              ''
-            );
+        name: cfg:
+        lib.nixosSystem {
+          specialArgs = {
+            inherit secrets;
           };
-          "test-${name}" = {
-            type = "app";
-            program = toString (
-              pkgs.writeShellScript "test-${name}" ''
-                exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng test \
-                  --flake ".#${name}" \
-                  --target-host "root@${name}" \
-                  --build-host "root@${name}"
-              ''
-            );
-          };
-          "build-${name}" = {
-            type = "app";
-            program = toString (
-              pkgs.writeShellScript "build-${name}" ''
-                exec ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng build \
-                  --flake ".#${name}" \
-                  --target-host "root@${name}" \
-                  --build-host "root@${name}"
-              ''
-            );
-          };
+          modules = hostModules name cfg;
         };
     in
     {
       # Generate NixOS configurations for all hosts
       nixosConfigurations = nixpkgs.lib.mapAttrs mkHost hosts;
-
-      # Generate deployment apps for common systems
-      apps =
-        nixpkgs.lib.genAttrs
-          [
-            "x86_64-linux"
-            "aarch64-linux"
-            "x86_64-darwin"
-            "aarch64-darwin"
-          ]
-          (system: nixpkgs.lib.foldl' (acc: name: acc // mkApps system name) { } (builtins.attrNames hosts));
-    };
+    }
+    // (flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        mkCmd = (
+          name: ''
+            ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng \
+              --flake .#${name} \
+              --target-host root@${name} \
+              --build-host root@${name} \
+              {{.CLI_ARGS}}
+          ''
+        );
+        taskfile = {
+          version = "3";
+          output = "prefixed";
+          tasks = {
+            default = {
+              desc = "Check flake";
+              cmd = "nix flake check --no-build";
+            };
+          }
+          # Per tag group tasks
+          // lib.foldl' (
+            acc: hostName:
+            let
+              hostTags = hosts.${hostName}.tags;
+            in
+            lib.foldl' (
+              taskAcc: tag:
+              taskAcc
+              // {
+                "@${tag}" = {
+                  desc = "Deploy configuration to all ${tag} hosts";
+                  deps = taskAcc.${tag}.deps or [ ] ++ [ hostName ];
+                };
+              }
+            ) acc hostTags
+          ) { } (lib.attrNames hosts)
+          # Per host tasks
+          // lib.mapAttrs (name: cfg: {
+            desc = "Deploy configuration to ${name}";
+            cmds = [
+              (mkCmd name)
+            ];
+          }) hosts;
+        };
+      in
+      {
+        apps.taskfile = {
+          type = "app";
+          program = toString (
+            pkgs.writeShellScript "taskfile" ''
+              set -euo pipefail
+              echo '${builtins.toJSON taskfile}' | ${pkgs.jq}/bin/jq
+              exec ${pkgs.go-task}/bin/task -d ./ --taskfile <(echo '${builtins.toJSON taskfile}') "$@"
+            ''
+          );
+        };
+      }
+    ));
 }
