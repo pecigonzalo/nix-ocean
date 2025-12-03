@@ -77,7 +77,7 @@
       );
 
       # WARN: Manifests are handled with tmpfile manager, they don't get removed until reboot
-      manifests = {
+      manifests = lib.mkIf config.reefNode.cluster.isInitNode {
         traefikConfig = {
           target = "traefik-config.yaml";
           content = {
