@@ -117,6 +117,18 @@
               desc = "Check flake";
               cmd = "nix flake check --no-build";
             };
+            synth = {
+              desc = "Synthesize K8s manifests with cdk8s";
+              cmd = "cdk8s synth";
+              sources = [ "k8s/**/*" ];
+              generates = [ "dist/**/*.yaml" ];
+            };
+            deploy = {
+              desc = "Deploy reef k8s cluster with kapp";
+              sources = [ "dist/**/*" ];
+              deps = [ "synth" ];
+              cmd = "kapp app-group deploy -g cdk8s -d ./dist --yes";
+            };
           }
           # Per tag group tasks
           // lib.mapAttrs' (tag: hostNames: {
@@ -161,6 +173,18 @@
         };
         apps = {
           taskfile = taskfileApp;
+        };
+        devShells = {
+          default = pkgs.mkShellNoCC {
+            packages =
+              with pkgs;
+              [
+                bun
+                kapp
+                vtsls
+              ]
+              ++ [ taskfilePackage ];
+          };
         };
       }
     ));

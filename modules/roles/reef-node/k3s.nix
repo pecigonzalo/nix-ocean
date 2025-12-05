@@ -89,14 +89,31 @@
             };
             spec = {
               valuesContent = builtins.toJSON {
-                additionalArguments = [
-                  "--api"
-                  "--api.dashboard=true"
-                  "--api.insecure=true"
-                ];
+                # Only use web and websecure entrypoints by default
+                ports = {
+                  web.asDefault = true;
+                  websecure.asDefault = true;
+                };
                 ingressRoute.dashboard = {
                   enabled = true;
                   entryPoints = [ "traefik" ];
+                };
+                logs = {
+                  access = {
+                    enabled = true;
+                    # Performance
+                    bufferingSize = 100;
+                    # Noise Reduction
+                    filters = {
+                      retryattempts = true;
+                      # 200-299 is okay, but often dropped to save space in high-traffic apps
+                      statuscodes = "400-499,500-599";
+                    };
+                  };
+                };
+                # NOTE: Enabling requires setting a OTLP endpoint
+                tracing = {
+                  enabled = true;
                 };
               };
             };
@@ -111,11 +128,7 @@
               name = "stripprefix";
               namespace = "default";
             };
-            spec = {
-              stripPrefixRegex = {
-                regex = [ "^/[^/]+" ];
-              };
-            };
+            spec.stripPrefixRegex.regex = [ "^/[^/]+" ];
           };
         };
       };
