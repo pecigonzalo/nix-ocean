@@ -18,7 +18,7 @@ export class NatsoperatorChart extends Chart {
   ) {
     super(scope, id, chartProps);
 
-    const finalProps = {
+    const p = {
       name: "default",
       cluster: {
         create: false,
@@ -28,10 +28,10 @@ export class NatsoperatorChart extends Chart {
 
     new Natsoperator(this, "nats-operator", {
       helmFlags: ["--skip-tests", "--include-crds"],
-      releaseName: finalProps.name,
+      releaseName: p.name,
       values: {
         cluster: {
-          create: finalProps.cluster.create,
+          create: p.cluster.create,
         },
       },
     });

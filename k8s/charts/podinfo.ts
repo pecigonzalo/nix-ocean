@@ -17,26 +17,26 @@ export class PodinfoChart extends Chart {
   ) {
     super(scope, id, chartProps);
 
-    const finalProps = {
+    const p = {
       name: "default",
       image: "ghcr.io/stefanprodan/podinfo:latest",
       replicas: 2,
       ...props,
     };
 
-    const imageName = finalProps.image.split(":")[0];
-    const imageTag = finalProps.image.split(":")[1] || "latest";
+    const imageName = p.image.split(":")[0];
+    const imageTag = p.image.split(":")[1] || "latest";
 
     new Podinfo(this, "podinfo", {
       helmFlags: ["--skip-tests"],
-      releaseName: finalProps.name,
+      releaseName: p.name,
       values: {
         // We can override Helm values here programmatically
         ui: {
           message: "Hello from CDK8s + Kapp!",
           color: "#34577c",
         },
-        replicaCount: finalProps.replicas,
+        replicaCount: p.replicas,
         ingress: {
           enabled: true,
           annotations: {
@@ -47,7 +47,7 @@ export class PodinfoChart extends Chart {
             {
               paths: [
                 {
-                  path: `/podinfo/${finalProps.name}`,
+                  path: `/podinfo/${p.name}`,
                   pathType: "ImplementationSpecific",
                 },
               ],
