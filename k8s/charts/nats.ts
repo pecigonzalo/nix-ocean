@@ -1,37 +1,40 @@
 import { Chart, type ChartProps } from "cdk8s";
 import { Construct } from "constructs";
-import { Natsoperator } from "../../imports/nats-operator";
+import { Nats } from "../../imports/nats";
 
-export interface NatsoperatorProps {
+export interface NatsProps {
   readonly name?: string;
-  readonly cluster?: {
-    create?: boolean;
+  readonly config?: {
+    readonly cluster: { readonly enabled: boolean };
+    readonly jetstream: { readonly enabled: boolean };
   };
 }
 
-export class NatsoperatorChart extends Chart {
+export class NatsChart extends Chart {
   constructor(
     scope: Construct,
     id: string,
-    props?: NatsoperatorProps,
+    props?: NatsProps,
     chartProps: ChartProps = {},
   ) {
     super(scope, id, chartProps);
 
     const p = {
       name: "default",
-      cluster: {
-        create: false,
+      config: {
+        cluster: { enabled: false },
+        jetstream: { enabled: true },
       },
       ...props,
     };
 
-    new Natsoperator(this, "nats-operator", {
+    new Nats(this, "nats-operator", {
       helmFlags: ["--skip-tests", "--include-crds"],
       releaseName: p.name,
       values: {
-        cluster: {
-          create: p.cluster.create,
+        config: {
+          cluster: { enabled: p.config.cluster.enabled },
+          jetstream: { enabled: p.config.jetstream.enabled },
         },
       },
     });

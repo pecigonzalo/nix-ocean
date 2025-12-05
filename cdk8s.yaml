@@ -3,4 +3,4 @@ app: bun k8s/main.ts
 imports:
   - k8s
   - helm:oci://ghcr.io/stefanprodan/charts/podinfo@6.9.3
-  - helm:https://nats-io.github.io/k8s/helm/charts/nats-operator@v0.8.3
+  - helm:https://nats-io.github.io/k8s/helm/charts/nats@2.12.2
