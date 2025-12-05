@@ -22,7 +22,7 @@ export class NatsChart extends Chart {
     const p = {
       name: "default",
       config: {
-        cluster: { enabled: false },
+        cluster: { enabled: true },
         jetstream: { enabled: true },
       },
       ...props,
@@ -33,7 +33,10 @@ export class NatsChart extends Chart {
       releaseName: p.name,
       values: {
         config: {
-          cluster: { enabled: p.config.cluster.enabled },
+          cluster: {
+            enabled: p.config.cluster.enabled,
+            replicas: 3,
+          },
           jetstream: { enabled: p.config.jetstream.enabled },
         },
       },

@@ -7,7 +7,7 @@ const OUTPUT_DIR = "./dist";
 const app = new App({ outdir: OUTPUT_DIR });
 
 new PodinfoChart(app, "podinfo");
-new NatsChart(app, "nats-operator", {});
+new NatsChart(app, "nats", {});
 
 app.synth();
 organizeK8sFiles(OUTPUT_DIR);
