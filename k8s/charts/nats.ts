@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 import { Natsoperator } from "../../imports/nats-operator";
 
 export interface NatsoperatorProps {
-  readonly name: string;
+  readonly name?: string;
   readonly cluster?: {
     create?: boolean;
   };
