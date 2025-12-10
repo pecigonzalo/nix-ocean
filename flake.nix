@@ -66,7 +66,7 @@
         name: cfg:
         (cfg.modules or [ ])
         ++ [
-          ./hosts/${cfg.path}
+          ./nix/hosts/${cfg.path}
           # Make agenix module and secrets available to all hosts
           agenix.nixosModules.default
         ];
