@@ -1,15 +1,20 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   # Wrap container definitions to simplify instantiation
   proxied =
-    { name
-    , proxy ? true
-    , auth ? true
-    , host ? null
-    , port ? null
-    , domain ? "munin.xyz"
-    , container
-    ,
+    {
+      name,
+      proxy ? true,
+      auth ? true,
+      host ? null,
+      port ? null,
+      domain ? "munin.xyz",
+      container,
     }:
     let
       existingOptions = if (container ? extraOptions) then container.extraOptions else [ ];
@@ -21,9 +26,12 @@ let
             "--label=traefik.enable=true"
           ]
           ++ lib.optional auth "--label=traefik.http.routers.${name}.middlewares=authelia@docker"
-          ++ lib.optional (port != null) "--label=traefik.http.services.${name}.loadbalancer.server.port=${toString port}"
+          ++ lib.optional (
+            port != null
+          ) "--label=traefik.http.services.${name}.loadbalancer.server.port=${toString port}"
           ++ lib.optional (host != null) "--label=traefik.http.routers.${name}.rule=Host(`${host}.${domain}`)"
-        else [ ];
+        else
+          [ ];
       newContainer = container // {
         extraOptions = existingOptions ++ proxyOptions;
         log-driver = "local";
@@ -59,7 +67,6 @@ in
     ./traefik.nix
     ./portainer.nix
     ./plex.nix
-    ./unifi.nix
     ./bazarr.nix
     ./radarr.nix
     ./sonarr.nix

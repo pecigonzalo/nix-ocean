@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   config,
   ...
 }:
@@ -40,17 +41,20 @@
 
   virtualisation.oci-containers.containers.pihole = lib.mkIf config.router.services.pihole.enable {
     image = "pihole/pihole:latest";
-    extraOptions = [ "--memory=256m" ];
+    extraOptions = [
+      "--memory=256m"
+      "--dns=1.1.1.1"
+    ];
     networks = [ "host" ];
     privileged = true;
     environmentFiles = [
       config.router.services.pihole.secretsFile
     ];
     environment = {
+      FTLCONF_misc_etc_dnsmasq_d = "true";
       FTLCONF_dns_upstreams = config.router.services.pihole.upstreams;
       FTLCONF_dns_blocking_mode = "NODATA";
       FTLCONF_dns_interface = "lan";
-      FTLCONF_dns_listeningMode = "ALL";
       FTLCONF_dns_bogusPriv = "true";
       FTLCONF_dns_domainNeeded = "true";
       FTLCONF_dns_expandHosts = "true";
@@ -63,18 +67,94 @@
       FTLCONF_dhcp_router = config.router.lan.address;
       FTLCONF_dhcp_hosts = lib.concatStringsSep ";" config.router.services.pihole.dhcpHosts;
     };
-    volumes = [ "/etc/pihole:/etc/pihole" ];
-  };
-
-  virtualisation.oci-containers.containers.matter-server = {
-    image = "ghcr.io/matter-js/python-matter-server:stable";
-    extraOptions = [ "--memory=128m" ];
-    networks = [ "host" ];
     volumes = [
-      "data:/data"
-      "/run/dbus:/run/dbus:ro"
+      "/etc/pihole:/etc/pihole"
+      # Mount the custom config to force specific interface binding
+      "${pkgs.writeText "99-interfaces.conf" ''
+        interface=lo
+        interface=tailscale0
+        interface=lan
+        bind-interfaces
+      ''}:/etc/dnsmasq.d/99-interfaces.conf"
     ];
   };
+
+  systemd.services.init-unifi-network = {
+    description = "Create the network bridge for Unifi containers";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      ${pkgs.podman}/bin/podman network create unifi
+    '';
+  };
+
+  virtualisation.oci-containers.containers.unifi-db = {
+    image = "mongo:4.4";
+    extraOptions = [ "--memory=512M" ];
+    networks = [
+      "unifi"
+    ];
+    volumes = [
+      "unifi-db:/data/db"
+      "${pkgs.writeText "init-mongo.js" ''
+        db.getSiblingDB("unifi").createUser({user: "unifi", pwd: "unifi", roles: [{role: "dbOwner", db: "unifi"}]});
+        db.getSiblingDB("unifi_stat").createUser({user: "unifi", pwd: "unifi", roles: [{role: "dbOwner", db: "unifi_stat"}]});
+      ''}:/docker-entrypoint-initdb.d/init-mongo.js:ro"
+    ];
+  };
+  systemd.services.podman-unifi-db = {
+    requires = [ "init-unifi-network.service" ];
+    after = [ "init-unifi-network.service" ];
+  };
+
+  virtualisation.oci-containers.containers.unifi = {
+    image = "ghcr.io/linuxserver/unifi-network-application:10.0.160";
+    extraOptions = [ "--memory=1G" ];
+    networks = [
+      "podman"
+      "unifi"
+    ];
+    environment = {
+      MONGO_DBNAME = "unifi";
+      MONGO_HOST = "unifi-db";
+      MONGO_PORT = "27017";
+      MONGO_USER = "unifi";
+      MONGO_PASS = "unifi";
+    };
+    ports = [
+      "8443:8443"
+      "8080:8080"
+      "3478:3478/udp" # STUN port for UniFi devices
+      "10001:10001/udp" # Doscovery port for UniFi devices
+      # "1900:1900/udp" # SSDP port for UniFi Protect devices
+    ];
+    volumes = [
+      "/etc/unifi:/config"
+    ];
+    dependsOn = [
+      "unifi-db"
+    ];
+  };
+  systemd.services.podman-unifi = {
+    requires = [ "init-unifi-network.service" ];
+    after = [ "init-unifi-network.service" ];
+  };
+
+  virtualisation.oci-containers.containers.matter-server =
+    lib.mkIf config.router.services.homeAssistant.enable
+      {
+        image = "ghcr.io/matter-js/python-matter-server:stable";
+        extraOptions = [ "--memory=128m" ];
+        networks = [ "host" ];
+        volumes = [
+          "data:/data"
+          "/run/dbus:/run/dbus:ro"
+        ];
+      };
 
   virtualisation.oci-containers.containers.home-assistant =
     lib.mkIf config.router.services.homeAssistant.enable
