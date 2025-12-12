@@ -86,6 +86,7 @@
     internalInterfaces = [
       "lan"
       "tailscale0"
+      "unifi"
     ];
     externalInterface = "wan";
   };
@@ -96,6 +97,7 @@
     trustedInterfaces = [
       "tailscale0"
       "lan"
+      "unifi"
     ];
     checkReversePath = "loose";
     allowPing = true;

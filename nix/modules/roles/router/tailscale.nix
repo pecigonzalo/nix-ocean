@@ -10,12 +10,13 @@
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "server";
-    extraSetFlags =
-      [
-        "--advertise-exit-node"
-      ]
-      ++ (lib.optional (config.router.tailscale.routes != [ ])
-        "--advertise-routes=${lib.concatStringsSep "," config.router.tailscale.routes}");
+    extraSetFlags = [
+      "--advertise-exit-node"
+      "--accept-dns=false"
+    ]
+    ++ (lib.optional (
+      config.router.tailscale.routes != [ ]
+    ) "--advertise-routes=${lib.concatStringsSep "," config.router.tailscale.routes}");
   };
 
   systemd.services.tailscaled-autoconnect = {
