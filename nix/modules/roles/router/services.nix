@@ -83,6 +83,10 @@
       ''}:/etc/dnsmasq.d/99-interfaces.conf"
     ];
   };
+  systemd.services.podman-pihole = {
+    requires = [ "tailscaled.service" ];
+    after = [ "tailscaled.service" ];
+  };
 
   virtualisation.oci-containers.containers.matter-server =
     lib.mkIf config.router.services.homeAssistant.enable

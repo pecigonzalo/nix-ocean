@@ -1,10 +1,13 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    flake-utils.url = "github:numtide/flake-utils";
-    disko.url = "github:nix-community/disko";
-    agenix.url = "github:ryantm/agenix";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
+
+    disko.url = "github:nix-community/disko";
+    flake-utils.url = "github:numtide/flake-utils";
+    agenix.url = "github:ryantm/agenix";
+
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
     # Secrets repository (separate git repo)
     secrets = {
@@ -21,6 +24,7 @@
       agenix,
       home-manager,
       secrets,
+      determinate,
       ...
     }:
     let
@@ -88,7 +92,20 @@
     // (flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        # Creave an overlay to use Determinate's nix in nixos-rebuild-ng
+        nixos-rebuild-ng-overlay = final: prev: {
+          nixos-rebuild-ng = prev.nixos-rebuild-ng.override {
+            # Swap the upstream 'nix' with the Determinate one
+            nix = determinate.packages.${system}.default // {
+              # Manually satisfy the version check
+              version = "2.18";
+            };
+          };
+        };
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ nixos-rebuild-ng-overlay ];
+        };
         mkCmd = name: ''
           ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng \
             --flake .#${name} \
