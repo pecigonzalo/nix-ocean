@@ -37,15 +37,44 @@
     };
   };
 
-  # LAN interface - static configuration
-  systemd.network.networks."20-lan" = {
-    matchConfig.Name = "lan";
+  # Create MACVLAN bridge for LAN interface and containers
+  systemd.network.netdevs."10-mv-lan-bridge" = {
+    netdevConfig = {
+      Name = "mv-lan-bridge";
+      Kind = "macvlan";
+    };
+
+    macvlanConfig = {
+      Mode = "bridge";
+    };
+  };
+
+  systemd.network.networks."10-mv-lan-bridge" = {
+    matchConfig.Name = "mv-lan-bridge";
+
     linkConfig.RequiredForOnline = "routable";
+
     address = [ "${config.router.lan.address}/${toString config.router.lan.prefixLength}" ];
+
     networkConfig = {
+      BindCarrier = "lan";
+      DHCP = "no";
+    };
+  };
+
+  # Attach LAN interface to MACVLAN bridge
+  systemd.network.networks."10-lan" = {
+    matchConfig.Name = "lan";
+
+    linkConfig.RequiredForOnline = "carrier";
+
+    networkConfig = {
+      MACVLAN = "mv-lan-bridge";
       DHCP = "no";
       IPv6AcceptRA = false;
-      DHCPServer = false; # Pi-hole handles DHCP
+      LinkLocalAddressing = "no";
+      MulticastDNS = false;
+      LLMNR = false;
     };
   };
 
@@ -84,9 +113,8 @@
   networking.nat = {
     enable = true;
     internalInterfaces = [
-      "lan"
+      "mv-lan-bridge"
       "tailscale0"
-      "unifi"
     ];
     externalInterface = "wan";
   };
@@ -95,9 +123,8 @@
   networking.firewall = {
     enable = true;
     trustedInterfaces = [
+      "mv-lan-bridge"
       "tailscale0"
-      "lan"
-      "unifi"
     ];
     checkReversePath = "loose";
     allowPing = true;

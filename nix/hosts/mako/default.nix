@@ -13,6 +13,7 @@
     ../../modules/common/performance.nix
     ../../modules/common/server-tools.nix
     ../../modules/common/users.nix
+    ../../modules/common/containers.nix
     ../../modules/roles/n150
     ../../modules/roles/router
   ];
@@ -52,6 +53,23 @@
       routes = [ "192.168.127.0/24" ];
     };
     services = {
+      dns = {
+        enable = true;
+        address = "192.168.127.25/24";
+      };
+      dhcp = {
+        enable = false;
+        start = "192.168.127.100";
+        end = "192.168.127.200";
+      };
+      unifi = {
+        enable = true;
+        address = "192.168.127.250/24";
+      };
+      home-assistant = {
+        enable = true;
+        address = "192.168.127.40/24";
+      };
       pihole = {
         enable = true;
         secretsFile = config.age.secrets.pihole.path;

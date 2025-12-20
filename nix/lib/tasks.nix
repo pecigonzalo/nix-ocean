@@ -27,7 +27,7 @@ let
       --flake .#${name} \
       --target-host root@${name} \
       --build-host root@${name} \
-      --use-remote-sudo --use-substitutes \
+      --use-substitutes \
       {{.CLI_ARGS}}
   '';
 
@@ -95,7 +95,7 @@ let
       cat > $out/bin/task <<EOF
         #!${pkgs.runtimeShell}
         set -euo pipefail
-        exec ${pkgs.go-task}/bin/task -d ./ --taskfile "$out/share/taskfiles/Taskfile.yml" "$@"
+        exec ${pkgs.go-task}/bin/task -d ./ --taskfile "$out/share/taskfiles/Taskfile.yml" "\$@"
       EOF
       chmod +x $out/bin/task
     '';

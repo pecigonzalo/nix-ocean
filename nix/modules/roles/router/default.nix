@@ -7,6 +7,9 @@
     ./networking.nix
     ./tailscale.nix
     ./services.nix
+    ./dns.nix
+    ./unifi.nix
+    ./home-assistant.nix
   ];
 
   options = {
@@ -53,6 +56,44 @@
         };
       };
       services = {
+        dns = {
+          enable = lib.mkEnableOption "Enable DNS service";
+          address = lib.mkOption {
+            type = lib.types.str;
+          };
+          upstreams = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [
+              "1.1.1.1"
+              "8.8.8.8"
+            ];
+          };
+        };
+        dhcp = {
+          enable = lib.mkEnableOption "Enable DHCP service";
+          start = lib.mkOption {
+            type = lib.types.str;
+            description = "DHCP range start address";
+          };
+          end = lib.mkOption {
+            type = lib.types.str;
+            description = "DHCP range end address";
+          };
+        };
+        unifi = {
+          enable = lib.mkEnableOption "Enable Unifi service";
+          address = lib.mkOption {
+            type = lib.types.str;
+            description = "Unifi controller address";
+          };
+        };
+        home-assistant = {
+          enable = lib.mkEnableOption "Enable HomeAssistant service";
+          address = lib.mkOption {
+            type = lib.types.str;
+            description = "Unifi controller address";
+          };
+        };
         pihole = {
           enable = lib.mkEnableOption "Pi-hole DNS and DHCP server";
           dhcpRange = {

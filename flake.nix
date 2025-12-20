@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.05";
 
     disko.url = "github:nix-community/disko";
@@ -19,6 +20,7 @@
   outputs =
     {
       nixpkgs,
+      nixpkgs-unstable,
       flake-utils,
       disko,
       agenix,
@@ -81,6 +83,7 @@
         lib.nixosSystem {
           specialArgs = {
             inherit secrets;
+            inherit nixpkgs-unstable;
           };
           modules = hostModules name cfg;
         };
@@ -96,7 +99,13 @@
       let
         pkgs = import nixpkgs { inherit system; };
         tasksForSystem = tasks {
-          inherit nixpkgs lib hosts determinate system;
+          inherit
+            nixpkgs
+            lib
+            hosts
+            determinate
+            system
+            ;
         };
       in
       {

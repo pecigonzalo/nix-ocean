@@ -19,11 +19,11 @@
   # Firewall rules for router services
   # Note: lan and tailscale0 are already in trustedInterfaces (networking.nix)
   # so these rules are redundant but kept for explicitness
-  networking.firewall.interfaces.lan.allowedTCPPorts =
+  networking.firewall.interfaces.vm--lan.allowedTCPPorts =
     (lib.optionals config.router.services.pihole.enable [ 80 ])
     ++ (lib.optionals config.router.services.homeAssistant.enable [ 8123 ]);
 
-  networking.firewall.interfaces.lan.allowedUDPPorts =
+  networking.firewall.interfaces.mv-lan.allowedUDPPorts =
     lib.optionals config.router.services.pihole.enable
       [
         53
@@ -58,7 +58,7 @@
       FTLCONF_misc_etc_dnsmasq_d = "true";
       FTLCONF_dns_upstreams = config.router.services.pihole.upstreams;
       FTLCONF_dns_blocking_mode = "NODATA";
-      FTLCONF_dns_interface = "lan";
+      FTLCONF_dns_interface = "mv-lan-bridge";
       FTLCONF_dns_listeningMode = "BIND";
       FTLCONF_dns_bogusPriv = "true";
       FTLCONF_dns_domainNeeded = "true";
@@ -78,7 +78,7 @@
       "${pkgs.writeText "99-interfaces.conf" ''
         interface=lo
         interface=tailscale0
-        interface=lan
+        interface=mv-lan-bridge
         bind-interfaces
       ''}:/etc/dnsmasq.d/99-interfaces.conf"
     ];
