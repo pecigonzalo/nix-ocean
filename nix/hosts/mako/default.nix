@@ -59,6 +59,18 @@
         address = "192.168.127.5";
         dnsHosts = [
           {
+            ip = config.router.services.dns.address;
+            name = "dns";
+          }
+          {
+            ip = config.router.services.unifi.address;
+            name = "control";
+          }
+          {
+            ip = config.router.services.home-assistant.address;
+            name = "ha";
+          }
+          {
             ip = "192.168.127.10";
             name = "beta";
           }
@@ -69,14 +81,6 @@
           {
             ip = "192.168.127.12";
             name = "tetra";
-          }
-          {
-            ip = lib.strings.removeSuffix "/24" config.router.services.unifi.address;
-            name = "control";
-          }
-          {
-            ip = lib.strings.removeSuffix "/24" config.router.services.home-assistant.address;
-            name = "ha";
           }
         ];
       };
