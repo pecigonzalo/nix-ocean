@@ -54,12 +54,19 @@
               bootstrap_dns = config.router.services.dns.upstreams;
               upstream_dns = [
                 "[/home/]${config.router.services.dhcp.address}"
-                "[/127.168.192.in-addr.arpa/]${config.router.services.dhcp.address}"
               ]
               ++ config.router.services.dns.upstreams;
+
               private_networks = [ "192.168.127.0/24" ]; # TODO: Move to var
-              local_ptr_upstreams = [ config.router.services.dhcp.address ];
               use_private_ptr_resolvers = true;
+              local_ptr_upstreams = [ config.router.services.dhcp.address ];
+
+              hostsfile_enabled = false;
+            };
+            clients = {
+              runtime_sources = {
+                hosts = false;
+              };
             };
             dhcp = {
               enabled = false;

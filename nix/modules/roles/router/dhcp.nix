@@ -53,6 +53,7 @@
             settings = {
               interface = "mv-lan";
 
+              dhcp-authoritative = true;
               dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
               dhcp-option = [
                 "option:router,${config.router.lan.address}"
@@ -60,6 +61,7 @@
               ];
               dhcp-host = map toHost config.router.services.dhcp.dhcpHosts;
 
+              domain-needed = true;
               domain = "home";
               local = "/home/";
               expand-hosts = true;

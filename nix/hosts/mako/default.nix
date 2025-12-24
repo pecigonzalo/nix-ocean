@@ -59,6 +59,10 @@
         address = "192.168.127.5";
         dnsHosts = [
           {
+            ip = config.router.lan.address;
+            name = "mako";
+          }
+          {
             ip = config.router.services.dns.address;
             name = "dns";
           }
