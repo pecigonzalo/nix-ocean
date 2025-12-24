@@ -28,7 +28,7 @@
           useDHCP = false;
           useNetworkd = true;
           useHostResolvConf = false;
-          nameservers = [ "${config.router.services.dns.address}/24" ];
+          nameservers = [ config.router.services.dns.address ];
         };
         systemd.network = {
           enable = true;
@@ -36,7 +36,7 @@
             "lan" = {
               matchConfig.Name = "mv-lan";
               linkConfig.RequiredForOnline = "routable";
-              address = [ config.router.services.unifi.address ];
+              address = [ "${config.router.services.unifi.address}/24" ];
               gateway = [ config.router.lan.address ];
             };
           };

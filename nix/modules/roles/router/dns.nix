@@ -60,13 +60,6 @@
               private_networks = [ "192.168.127.0/24" ]; # TODO: Move to var
               local_ptr_upstreams = [ config.router.services.dhcp.address ];
               use_private_ptr_resolvers = true;
-              rewrites = map
-                (host: {
-                  answer = host.ip;
-                  domain = host.name;
-                  type = "A";
-                })
-                config.router.services.dns.dnsHosts;
             };
             dhcp = {
               enabled = false;
@@ -75,6 +68,11 @@
               protection_enabled = true;
               filtering_enabled = true;
               parental_enabled = false;
+              rewrites = map (host: {
+                answer = host.ip;
+                domain = "${host.name}.home";
+                type = "A";
+              }) config.router.services.dns.dnsHosts;
             };
             filters =
               map
