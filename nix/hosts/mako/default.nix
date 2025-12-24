@@ -67,6 +67,10 @@
             name = "dns";
           }
           {
+            ip = config.router.services.dhcp.address;
+            name = "dhcp";
+          }
+          {
             ip = config.router.services.unifi.address;
             name = "control";
           }
