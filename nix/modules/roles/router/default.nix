@@ -68,6 +68,24 @@
               "8.8.8.8"
             ];
           };
+          dnsHosts = lib.mkOption {
+            type = lib.types.listOf (
+              lib.types.submodule {
+                options = {
+                  name = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Hostname";
+                  };
+                  ip = lib.mkOption {
+                    type = lib.types.str;
+                    description = "IP address";
+                  };
+                };
+              }
+            );
+            default = [ ];
+            description = "Custom DNS host mappings";
+          };
         };
         dhcp = {
           enable = lib.mkEnableOption "Enable DHCP service";
@@ -78,6 +96,28 @@
           end = lib.mkOption {
             type = lib.types.str;
             description = "DHCP range end address";
+          };
+          dhcpHosts = {
+            type = lib.types.listOf (
+              lib.types.submodule {
+                options = {
+                  name = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Hostname";
+                  };
+                  ip = lib.mkOption {
+                    type = lib.types.str;
+                    description = "IP address";
+                  };
+                  mac = lib.mkOption {
+                    type = lib.types.str;
+                    description = "MAC address";
+                  };
+                };
+              }
+            );
+            default = [ ];
+            description = "Static DHCP host mappings";
           };
         };
         unifi = {
@@ -92,6 +132,11 @@
           address = lib.mkOption {
             type = lib.types.str;
             description = "Unifi controller address";
+          };
+          zigbeeDevice = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Zigbee USB device path";
           };
         };
         pihole = {
