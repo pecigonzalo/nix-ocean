@@ -28,7 +28,7 @@
           useDHCP = false;
           useNetworkd = true;
           useHostResolvConf = false;
-          nameservers = [ config.router.services.dns.address ];
+          nameservers = [ "${config.router.services.dns.address}/24" ];
         };
         systemd.network = {
           enable = true;

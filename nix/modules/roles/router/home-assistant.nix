@@ -27,7 +27,7 @@
             "lan" = {
               matchConfig.Name = "mv-lan";
               linkConfig.RequiredForOnline = "routable";
-              address = [ config.router.services.home-assistant.address ];
+              address = [ "${config.router.services.home-assistant.address}/24" ];
               gateway = [ config.router.lan.address ];
             };
           };

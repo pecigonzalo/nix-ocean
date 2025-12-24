@@ -56,7 +56,7 @@
     services = {
       dns = {
         enable = true;
-        address = "192.168.127.5/24";
+        address = "192.168.127.5";
         dnsHosts = [
           {
             ip = "192.168.127.10";
@@ -82,7 +82,7 @@
       };
       dhcp = {
         enable = true;
-        address = "192.168.127.2/24";
+        address = "192.168.127.2";
         start = "192.168.127.100";
         end = "192.168.127.200";
         dhcpHosts = [
@@ -125,11 +125,11 @@
       };
       unifi = {
         enable = true;
-        address = "192.168.127.250/24";
+        address = "192.168.127.250";
       };
       home-assistant = {
         enable = true;
-        address = "192.168.127.40/24";
+        address = "192.168.127.40";
       };
       homeAssistant = {
         enable = true;

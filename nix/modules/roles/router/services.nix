@@ -54,8 +54,8 @@ in
       FTLCONF_dns_domainNeeded = "true";
       FTLCONF_dns_expandHosts = "true";
       FTLCONF_dns_hosts = lib.concatStringsSep ";" dnsHosts;
-      FTLCONF_dhcp_active = "true";
-      FTLCONF_dhcp_ipv6 = "true";
+      FTLCONF_dhcp_active = "false";
+      FTLCONF_dhcp_ipv6 = "false";
       FTLCONF_dhcp_rapidCommit = "true";
       FTLCONF_dhcp_start = dhcpRange.start;
       FTLCONF_dhcp_end = dhcpRange.end;

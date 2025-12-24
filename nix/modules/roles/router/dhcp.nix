@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   ...
 }:
 {
@@ -20,7 +19,7 @@
           useDHCP = false;
           useNetworkd = true;
           useHostResolvConf = false;
-          nameservers = config.router.services.dns.upstreams;
+          nameservers = [ config.router.services.dns.address ];
         };
         systemd.network = {
           enable = true;
@@ -28,32 +27,42 @@
             "lan" = {
               matchConfig.Name = "mv-lan";
               linkConfig.RequiredForOnline = "routable";
-              address = [ config.router.services.dhcp.address ];
+              address = [ "${config.router.services.dhcp.address}/24" ];
               gateway = [ config.router.lan.address ];
             };
           };
         };
-        networking.firewall.allowedUDPPorts = [ 67 ];
+        services.resolved = {
+          # Avoid port conflict with AdGuardHome
+          extraConfig = ''
+            DNSStubListener=no
+          '';
+        };
+        networking.firewall.allowedTCPPorts = [ 53 ];
+        networking.firewall.allowedUDPPorts = [
+          67
+          53
+        ];
         services.dnsmasq =
           let
-            toHost = host: "dhcp-host=${host.mac},${host.ip},${host.name}";
+            toHost = host: "${host.mac},${host.name},${host.ip}";
           in
           {
             enable = config.router.services.dhcp.enable;
+            resolveLocalQueries = false;
             settings = {
               interface = "mv-lan";
+              log-dhcp = true;
+
               dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
               dhcp-option = [
                 "option:router,${config.router.lan.address}"
                 "option:dns-server,${config.router.services.dns.address}"
               ];
-              dhcp-hosts = map toHost config.router.services.dhcp.dhcpHosts;
-              domain = "lan";
+              dhcp-host = map toHost config.router.services.dhcp.dhcpHosts;
+
+              domain = "home";
               expand-hosts = true;
-              listen-address = [
-                "127.0.0.1"
-                config.router.services.dhcp.address
-              ];
             };
           };
       };
