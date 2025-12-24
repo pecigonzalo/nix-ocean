@@ -19,7 +19,7 @@
           useDHCP = false;
           useNetworkd = true;
           useHostResolvConf = false;
-          nameservers = [ config.router.services.dns.address ];
+          nameservers = config.router.services.dns.upstreams;
         };
         systemd.network = {
           enable = true;
@@ -49,7 +49,7 @@
           in
           {
             enable = config.router.services.dhcp.enable;
-            resolveLocalQueries = true;
+            # resolveLocalQueries = true;
             settings = {
               interface = "mv-lan";
 
@@ -61,7 +61,10 @@
               dhcp-host = map toHost config.router.services.dhcp.dhcpHosts;
 
               domain = "home";
+              local = "/home/";
               expand-hosts = true;
+              no-resolv = true;
+              server = config.router.services.dns.upstreams;
             };
           };
       };
