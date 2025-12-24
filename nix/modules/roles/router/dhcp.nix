@@ -45,14 +45,13 @@
         ];
         services.dnsmasq =
           let
-            toHost = host: "${host.mac},${host.name},${host.ip}";
+            toHost = host: "${host.mac},${host.ip},${host.name}";
           in
           {
             enable = config.router.services.dhcp.enable;
-            resolveLocalQueries = false;
+            resolveLocalQueries = true;
             settings = {
               interface = "mv-lan";
-              log-dhcp = true;
 
               dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
               dhcp-option = [
