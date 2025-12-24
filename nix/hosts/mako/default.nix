@@ -4,6 +4,7 @@
 {
   secrets,
   config,
+  lib,
   ...
 }:
 {
@@ -70,18 +71,18 @@
             name = "tetra";
           }
           {
-            ip = config.router.services.unifi.address.ip;
+            ip = lib.strings.removeSuffix "/24" config.router.services.unifi.address;
             name = "control";
           }
           {
-            ip = config.router.services.home-assistant.address.ip;
+            ip = lib.strings.removeSuffix "/24" config.router.services.home-assistant.address;
             name = "ha";
           }
         ];
       };
       dhcp = {
         enable = true;
-        address = "192.168.127.2";
+        address = "192.168.127.2/24";
         start = "192.168.127.100";
         end = "192.168.127.200";
         dhcpHosts = [

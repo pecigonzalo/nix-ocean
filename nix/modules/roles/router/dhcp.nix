@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   ...
 }:
 {
@@ -32,12 +33,29 @@
             };
           };
         };
-        services.dnsmasq = {
-          enable = true;
-          settings = {
-            domain = "home";
+        networking.firewall.allowedUDPPorts = [ 67 ];
+        services.dnsmasq =
+          let
+            toHost = host: "dhcp-host=${host.mac},${host.ip},${host.name}";
+          in
+          {
+            enable = config.router.services.dhcp.enable;
+            settings = {
+              interface = "mv-lan";
+              dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
+              dhcp-option = [
+                "option:router,${config.router.lan.address}"
+                "option:dns-server,${config.router.services.dns.address}"
+              ];
+              dhcp-hosts = map toHost config.router.services.dhcp.dhcpHosts;
+              domain = "lan";
+              expand-hosts = true;
+              listen-address = [
+                "127.0.0.1"
+                config.router.services.dhcp.address
+              ];
+            };
           };
-        };
       };
   };
 }

@@ -8,6 +8,7 @@
     ./tailscale.nix
     ./services.nix
     ./dns.nix
+    ./dhcp.nix
     ./unifi.nix
     ./home-assistant.nix
   ];
@@ -89,6 +90,10 @@
         };
         dhcp = {
           enable = lib.mkEnableOption "Enable DHCP service";
+          address = lib.mkOption {
+            type = lib.types.str;
+            description = "DHCP service address";
+          };
           start = lib.mkOption {
             type = lib.types.str;
             description = "DHCP range start address";
@@ -97,7 +102,7 @@
             type = lib.types.str;
             description = "DHCP range end address";
           };
-          dhcpHosts = {
+          dhcpHosts = lib.mkOption {
             type = lib.types.listOf (
               lib.types.submodule {
                 options = {
@@ -139,38 +144,7 @@
             description = "Zigbee USB device path";
           };
         };
-        pihole = {
-          enable = lib.mkEnableOption "Pi-hole DNS and DHCP server";
-          dhcpRange = {
-            start = lib.mkOption {
-              type = lib.types.str;
-              description = "DHCP range start address";
-            };
-            end = lib.mkOption {
-              type = lib.types.str;
-              description = "DHCP range end address";
-            };
-          };
-          dhcpHosts = lib.mkOption {
-            type = lib.types.listOf lib.types.str;
-            default = [ ];
-            description = "Static DHCP host mappings (MAC,IP,NAME)";
-          };
-          dnsHosts = lib.mkOption {
-            type = lib.types.listOf lib.types.str;
-            default = [ ];
-            description = "Custom DNS host mappings (NAME IP)";
-          };
-          upstreams = lib.mkOption {
-            type = lib.types.str;
-            default = "1.1.1.1;8.8.8.8";
-            description = "Upstream DNS servers";
-          };
-          secretsFile = lib.mkOption {
-            type = lib.types.path;
-            description = "Path to secrets file to mount in pihole";
-          };
-        };
+        # OLD
         homeAssistant = {
           enable = lib.mkEnableOption "Home Assistant";
           zigbeeDevice = lib.mkOption {
