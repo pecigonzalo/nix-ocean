@@ -131,6 +131,10 @@
         enable = true;
         address = "192.168.127.40/24";
       };
+      homeAssistant = {
+        enable = true;
+        zigbeeDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
+      };
     };
   };
 
