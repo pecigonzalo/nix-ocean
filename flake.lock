@@ -415,11 +415,11 @@
     "secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1764606537,
-        "narHash": "sha256-IrVv+aH1jkS8Xk2ExIy6/3j5+swl5TDko8SFNL75tP0=",
+        "lastModified": 1766692706,
+        "narHash": "sha256-+nGOgviXs9ee5j0+13y97UvG2UiUsIzCWqbCqnxKRtQ=",
         "ref": "refs/heads/main",
-        "rev": "86d7fd77bcc7e3a9d5062493fc097a1f1869a284",
-        "revCount": 16,
+        "rev": "05f6e8a69bb669d87a6ba45dabcf3184d27062dc",
+        "revCount": 17,
         "type": "git",
         "url": "ssh://git@github.com/pecigonzalo/nix-ocean-secrets"
       },
