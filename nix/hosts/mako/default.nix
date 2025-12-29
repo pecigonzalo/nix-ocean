@@ -48,35 +48,35 @@
         dnsHosts = [
           {
             ip = config.router.lan.address;
-            name = "mako";
+            name = "mako.home";
           }
           {
             ip = config.router.services.dns.address;
-            name = "dns";
+            name = "dns.home";
           }
           {
             ip = config.router.services.dns.address;
-            name = "dhcp";
+            name = "dhcp.home";
           }
           {
             ip = config.router.services.unifi.address;
-            name = "control";
+            name = "control.home";
           }
           {
             ip = config.router.services.home-assistant.address;
-            name = "ha";
+            name = "ha.home";
           }
           {
             ip = "192.168.127.10";
-            name = "beta";
+            name = "beta.home";
           }
           {
             ip = "192.168.127.11";
-            name = "guppy";
+            name = "guppy.home";
           }
           {
             ip = "192.168.127.12";
-            name = "tetra";
+            name = "tetra.home";
           }
           {
             ip = "192.168.127.10";

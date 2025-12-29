@@ -137,7 +137,7 @@ in
               parental_enabled = false;
               rewrites = map (host: {
                 answer = host.ip;
-                domain = "${host.name}.${localDnsNetwork}";
+                domain = "${host.name}";
                 type = "A";
               }) config.router.services.dns.dnsHosts;
             };
