@@ -1,17 +1,5 @@
 { config, lib, ... }:
-let
-  inherit (lib) mkOption types;
-  perfCfg = config.ocean.performance;
-in
 {
-  options.ocean.performance.cpuGovernor = mkOption {
-    type = types.str;
-    default = "schedutil"; # Modern default governor
-    description = "Default CPU frequency governor for hosts.";
-    example = "ondemand";
-  };
-
-  config = {
     # Modern kernel parameters for better performance
     boot.kernelParams = [
       "transparent_hugepage=madvise" # Use madvise instead of always for better control
@@ -24,7 +12,6 @@ in
     # Modern CPU frequency scaling
     powerManagement = {
       enable = true;
-      cpuFreqGovernor = lib.mkDefault perfCfg.cpuGovernor;
     };
 
     # Kernel sysctl tuning for networking performance
@@ -40,5 +27,4 @@ in
       "net.core.default_qdisc" = lib.mkDefault "cake";
       "net.ipv4.tcp_congestion_control" = lib.mkDefault "bbr";
     };
-  };
 }

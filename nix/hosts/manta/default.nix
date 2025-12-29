@@ -89,8 +89,6 @@
       gcOptions = "--delete-older-than 15d";
       optimiseSchedule = [ "12:20" ];
     };
-
-    performance.cpuGovernor = "ondemand";
   };
 
   environment.systemPackages = with pkgs; [
