@@ -47,39 +47,51 @@
         address = "192.168.127.5";
         dnsHosts = [
           {
-            ip = config.router.lan.address;
+            target = config.router.lan.address;
             name = "mako.home";
           }
           {
-            ip = config.router.services.dns.address;
+            target = config.router.services.dns.address;
             name = "dns.home";
           }
           {
-            ip = config.router.services.dns.address;
+            target = config.router.services.dns.address;
             name = "dhcp.home";
           }
           {
-            ip = config.router.services.unifi.address;
+            target = config.router.services.unifi.address;
             name = "control.home";
           }
           {
-            ip = config.router.services.home-assistant.address;
+            target = config.router.services.home-assistant.address;
             name = "ha.home";
           }
           {
-            ip = "192.168.127.10";
+            target = "192.168.127.10";
             name = "beta.home";
           }
           {
-            ip = "192.168.127.11";
+            target = "192.168.127.11";
             name = "guppy.home";
           }
           {
-            ip = "192.168.127.12";
+            target = "192.168.127.12";
             name = "tetra.home";
           }
           {
-            ip = "192.168.127.10";
+            target = "192.168.127.10";
+            name = "k3s.home";
+          }
+          {
+            target = "192.168.127.11";
+            name = "k3s.home";
+          }
+          {
+            target = "192.168.127.12";
+            name = "k3s.home";
+          }
+          {
+            target = "k3s.home";
             name = "*.k3s.local";
           }
         ];

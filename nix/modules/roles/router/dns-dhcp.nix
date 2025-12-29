@@ -136,7 +136,7 @@ in
               parental_enabled = false;
               rewrite_enabled = true;
               rewrites = map (host: {
-                answer = host.ip;
+                answer = host.target;
                 domain = "${host.name}";
                 type = "A";
                 enabled = true;

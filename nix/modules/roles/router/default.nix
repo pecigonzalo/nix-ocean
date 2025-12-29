@@ -75,9 +75,9 @@
                     type = lib.types.str;
                     description = "Hostname";
                   };
-                  ip = lib.mkOption {
+                  target = lib.mkOption {
                     type = lib.types.str;
-                    description = "IP address";
+                    description = "Target host or IP address";
                   };
                 };
               }
