@@ -83,7 +83,6 @@ in
             enable = config.router.services.dhcp.enable;
             settings = {
               port = 5353;
-              interface = "lo";
 
               dhcp-authoritative = true;
               dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
@@ -135,10 +134,12 @@ in
               protection_enabled = true;
               filtering_enabled = true;
               parental_enabled = false;
+              rewrite_enabled = true;
               rewrites = map (host: {
                 answer = host.ip;
                 domain = "${host.name}";
                 type = "A";
+                enabled = true;
               }) config.router.services.dns.dnsHosts;
             };
             filters =
