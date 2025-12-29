@@ -172,7 +172,5 @@
     ];
 
     environment.sessionVariables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
-
-    systemd.services.k3s.serviceConfig.TimeoutStartSec = "300s";
   };
 }

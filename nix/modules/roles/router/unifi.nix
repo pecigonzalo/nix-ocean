@@ -49,6 +49,7 @@
           enable = true;
           openFirewall = true;
           unifiPackage = pkgs-unstable.unifi;
+          mongodbPackage = pkgs-unstable.mongodb-ce;
         };
       };
   };
