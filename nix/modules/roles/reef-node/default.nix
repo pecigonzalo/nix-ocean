@@ -59,7 +59,7 @@
         nameserver = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           description = "LAN nameserver(s)";
-          example = [ "192.168.127.254" ];
+          example = [ "192.168.127.5" ];
         };
       };
     };
