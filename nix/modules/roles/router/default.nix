@@ -6,9 +6,7 @@
   imports = [
     ./networking.nix
     ./tailscale.nix
-    ./services.nix
-    ./dns.nix
-    ./dhcp.nix
+    ./dns-dhcp.nix
     ./unifi.nix
     ./home-assistant.nix
   ];
@@ -90,10 +88,6 @@
         };
         dhcp = {
           enable = lib.mkEnableOption "Enable DHCP service";
-          address = lib.mkOption {
-            type = lib.types.str;
-            description = "DHCP service address";
-          };
           start = lib.mkOption {
             type = lib.types.str;
             description = "DHCP range start address";
@@ -138,15 +132,6 @@
             type = lib.types.str;
             description = "Unifi controller address";
           };
-          zigbeeDevice = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            default = null;
-            description = "Zigbee USB device path";
-          };
-        };
-        # OLD
-        homeAssistant = {
-          enable = lib.mkEnableOption "Home Assistant";
           zigbeeDevice = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
             default = null;

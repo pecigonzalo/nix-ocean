@@ -67,7 +67,7 @@
             name = "dns";
           }
           {
-            ip = config.router.services.dhcp.address;
+            ip = config.router.services.dns.address;
             name = "dhcp";
           }
           {
@@ -94,7 +94,6 @@
       };
       dhcp = {
         enable = true;
-        address = "192.168.127.2";
         start = "192.168.127.100";
         end = "192.168.127.200";
         dhcpHosts = [
@@ -142,9 +141,6 @@
       home-assistant = {
         enable = true;
         address = "192.168.127.40";
-      };
-      homeAssistant = {
-        enable = true;
         zigbeeDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
     };

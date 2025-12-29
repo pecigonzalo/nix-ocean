@@ -2,6 +2,9 @@
   config,
   ...
 }:
+let
+  localDnsNetwork = "home";
+in
 {
   containers.dns = {
     autoStart = true;
@@ -42,7 +45,37 @@
           53
           80
         ];
-        networking.firewall.allowedUDPPorts = [ 53 ];
+        networking.firewall.allowedUDPPorts = [
+          53
+          67
+        ];
+
+        services.dnsmasq =
+          let
+            toHost = host: "${host.mac},${host.ip},${host.name}";
+          in
+          {
+            enable = config.router.services.dhcp.enable;
+            settings = {
+              port = 5353;
+              interface = "mv-lan";
+
+              dhcp-authoritative = true;
+              dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
+              dhcp-option = [
+                "option:router,${config.router.lan.address}"
+                "option:dns-server,${config.router.services.dns.address}"
+              ];
+              dhcp-host = map toHost config.router.services.dhcp.dhcpHosts;
+
+              domain-needed = true;
+              domain = localDnsNetwork;
+              local = "/${localDnsNetwork}/";
+              expand-hosts = true;
+              no-resolv = true;
+            };
+          };
+
         services.adguardhome = {
           enable = config.router.services.dns.enable;
           openFirewall = true;
@@ -53,13 +86,13 @@
             dns = {
               bootstrap_dns = config.router.services.dns.upstreams;
               upstream_dns = [
-                "[/home/]${config.router.services.dhcp.address}"
+                "[/${localDnsNetwork}/]127.0.0.1:5353"
               ]
               ++ config.router.services.dns.upstreams;
 
               private_networks = [ "192.168.127.0/24" ]; # TODO: Move to var
               use_private_ptr_resolvers = true;
-              local_ptr_upstreams = [ config.router.services.dhcp.address ];
+              local_ptr_upstreams = [ "127.0.0.1:5353" ];
 
               hostsfile_enabled = false;
             };
@@ -77,7 +110,7 @@
               parental_enabled = false;
               rewrites = map (host: {
                 answer = host.ip;
-                domain = "${host.name}.home";
+                domain = "${host.name}.${localDnsNetwork}";
                 type = "A";
               }) config.router.services.dns.dnsHosts;
             };

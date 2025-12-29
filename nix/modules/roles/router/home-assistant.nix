@@ -1,5 +1,8 @@
 {
   config,
+  lib,
+  pkgs,
+  nixpkgs-unstable,
   ...
 }:
 {
@@ -10,8 +13,28 @@
     privateNetwork = true;
     memoryLimit = "1G";
 
+    # Mount Zigbee USB device
+    bindMounts = lib.optionalAttrs (config.router.services.home-assistant.zigbeeDevice != null) {
+      "/dev/ttyACM0" = {
+        hostPath = config.router.services.home-assistant.zigbeeDevice;
+        isReadOnly = false;
+      };
+    };
+    allowedDevices = [
+      {
+        node = "/dev/ttyACM0";
+        modifier = "rwm";
+      }
+    ];
+
     config =
       { ... }:
+      let
+        pkgs-unstable = import nixpkgs-unstable {
+          system = pkgs.system;
+          config.allowUnfree = true;
+        };
+      in
       {
         imports = [ ../../common/server-tools.nix ];
         system.stateVersion = "25.05";
@@ -27,16 +50,18 @@
             "lan" = {
               matchConfig.Name = "mv-lan";
               linkConfig.RequiredForOnline = "routable";
-              address = [ "${config.router.services.home-assistant.address}/24" ];
+              address = [ "${config.router.services."home-assistant".address}/24" ];
               gateway = [ config.router.lan.address ];
             };
           };
         };
 
         services.home-assistant = {
-          enable = true; # config.router.services.home-assistant.enable;
+          enable = config.router.services."home-assistant".enable;
+          package = pkgs-unstable.home-assistant;
           openFirewall = true;
           extraComponents = [
+            # Default
             "default_config"
             "met"
             "esphome"
@@ -48,6 +73,21 @@
             "google_translate"
             "radio_browser"
             "shopping_list"
+
+            # Custom
+            "matter"
+            "mobile_app"
+            "sun"
+            "telegram_bot"
+            "wiz"
+            "time_date"
+            "home_connect"
+            "roborock"
+            "reolink"
+            "cast"
+          ];
+          customComponents = with pkgs-unstable.home-assistant-custom-components; [
+            alarmo
           ];
           config = {
             default_config = { };
@@ -66,7 +106,7 @@
               time_zone = "Europe/Madrid";
 
               external_url = "https://ha.munin.xyz";
-              internal_url = "http://mako.local:8123";
+              internal_url = "http://ha.home:8123";
             };
             http = {
               use_x_forwarded_for = true;
@@ -75,6 +115,10 @@
               ];
             };
           };
+        };
+
+        services.matter-server = {
+          enable = true;
         };
       };
   };
