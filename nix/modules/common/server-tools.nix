@@ -15,7 +15,7 @@
       findutils
       coreutils
       # Disk tools
-      du-dust
+      dust
       # Networking tools
       dnsutils
       ldns # drill
