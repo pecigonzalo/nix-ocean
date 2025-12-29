@@ -94,7 +94,7 @@
     "net.ipv4.tcp_rmem" = "4096 87380 33554432";
     "net.ipv4.tcp_wmem" = "4096 65536 33554432";
     # Performance tuning
-    "net.core.default_qdisc" = "fq_codel";
+    "net.core.default_qdisc" = "cake";
     "net.ipv4.tcp_congestion_control" = "bbr";
     "net.ipv4.tcp_fin_timeout" = 15;
     # ARP/neighbor table tuning

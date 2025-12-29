@@ -65,7 +65,7 @@
     };
   };
 
-  config = lib.mkMerge [
+  config =
     # Base configuration (always enabled)
     {
       environment.systemPackages = with pkgs; [
@@ -73,6 +73,6 @@
         iw
         wirelesstools
       ];
-    }
-  ];
+      services.irqbalance.enable = false;
+    };
 }
