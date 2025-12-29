@@ -12,6 +12,8 @@
 
     macvlans = [ "lan" ];
     privateNetwork = true;
+    enableTun = true;
+
     memoryLimit = "1G";
 
     # Mount Zigbee USB device
