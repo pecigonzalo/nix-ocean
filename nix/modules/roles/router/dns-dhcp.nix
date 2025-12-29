@@ -1,4 +1,5 @@
 {
+  agenix,
   config,
   ...
 }:
@@ -6,18 +7,33 @@ let
   localDnsNetwork = "home";
 in
 {
-  containers.dns = {
+  containers.dns-dhcp = {
     autoStart = true;
 
     macvlans = [ "lan" ];
     privateNetwork = true;
+    enableTun = true;
+
     memoryLimit = "256M";
+
+    bindMounts."/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
 
     config =
       { ... }:
       {
-        imports = [ ../../common/server-tools.nix ];
+        imports = [
+          agenix.nixosModules.default
+          ../../common/server-tools.nix
+        ];
         system.stateVersion = "25.05";
+
+        age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+        # Agenix secrets from separate repository
+        # NOTE: This is not not nice and its breaking the interface of the module
+        age.secrets = {
+          tailscale.file = config.age.secrets.tailscale.file;
+        };
+
         networking = {
           useDHCP = false;
           useNetworkd = true;
@@ -41,6 +57,7 @@ in
             DNSStubListener=no
           '';
         };
+
         networking.firewall.allowedTCPPorts = [
           53
           80
@@ -50,6 +67,14 @@ in
           67
         ];
 
+        services.tailscale = {
+          enable = true;
+          extraSetFlags = [
+            "--accept-dns=false"
+          ];
+          authKeyFile = "/run/agenix/tailscale";
+        };
+
         services.dnsmasq =
           let
             toHost = host: "${host.mac},${host.ip},${host.name}";
@@ -58,7 +83,7 @@ in
             enable = config.router.services.dhcp.enable;
             settings = {
               port = 5353;
-              interface = "mv-lan";
+              interface = "lo";
 
               dhcp-authoritative = true;
               dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
@@ -69,10 +94,12 @@ in
               dhcp-host = map toHost config.router.services.dhcp.dhcpHosts;
 
               domain-needed = true;
+              bogus-priv = true;
+              no-resolv = true;
+
               domain = localDnsNetwork;
               local = "/${localDnsNetwork}/";
-              expand-hosts = true;
-              no-resolv = true;
+              expand-hosts = false;
             };
           };
 

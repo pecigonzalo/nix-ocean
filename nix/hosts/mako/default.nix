@@ -4,7 +4,6 @@
 {
   secrets,
   config,
-  lib,
   ...
 }:
 {
@@ -23,18 +22,7 @@
 
   # Agenix secrets from separate repository
   age.secrets = {
-    tailscale = {
-      file = "${secrets}/tailscale.age";
-      owner = "root";
-      group = "root";
-      mode = "400";
-    };
-    pihole = {
-      file = "${secrets}/pihole.age";
-      owner = "root";
-      group = "root";
-      mode = "400";
-    };
+    tailscale.file = "${secrets}/tailscale.age";
   };
 
   # Router configuration

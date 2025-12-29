@@ -82,8 +82,9 @@
         name: cfg:
         lib.nixosSystem {
           specialArgs = {
-            inherit secrets;
             inherit nixpkgs-unstable;
+            inherit agenix;
+            inherit secrets;
           };
           modules = hostModules name cfg;
         };
