@@ -38,6 +38,12 @@
     group = "root";
     mode = "400";
   };
+  age.secrets.tailscale-proxy = {
+    file = "${secrets}/tailscale-proxy.age";
+    owner = "root";
+    group = "root";
+    mode = "400";
+  };
 
   boot = {
     swraid.enable = true;

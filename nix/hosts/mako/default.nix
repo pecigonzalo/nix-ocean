@@ -4,6 +4,7 @@
 {
   secrets,
   config,
+  lib,
   ...
 }:
 {
@@ -55,42 +56,92 @@
     services = {
       dns = {
         enable = true;
-        address = "192.168.127.25/24";
+        address = "192.168.127.5";
+        dnsHosts = [
+          {
+            ip = config.router.lan.address;
+            name = "mako";
+          }
+          {
+            ip = config.router.services.dns.address;
+            name = "dns";
+          }
+          {
+            ip = config.router.services.dhcp.address;
+            name = "dhcp";
+          }
+          {
+            ip = config.router.services.unifi.address;
+            name = "control";
+          }
+          {
+            ip = config.router.services.home-assistant.address;
+            name = "ha";
+          }
+          {
+            ip = "192.168.127.10";
+            name = "beta";
+          }
+          {
+            ip = "192.168.127.11";
+            name = "guppy";
+          }
+          {
+            ip = "192.168.127.12";
+            name = "tetra";
+          }
+        ];
       };
       dhcp = {
-        enable = false;
+        enable = true;
+        address = "192.168.127.2";
         start = "192.168.127.100";
         end = "192.168.127.200";
+        dhcpHosts = [
+          {
+            mac = "EC:71:DB:D3:53:99";
+            ip = "192.168.127.50";
+            name = "reolink";
+          }
+          {
+            mac = "78:8A:20:D9:69:1F";
+            ip = "192.168.127.22";
+            name = "ap-upstairs";
+          }
+          {
+            mac = "24:5A:4C:11:C5:1C";
+            ip = "192.168.127.21";
+            name = "ap-main";
+          }
+          {
+            mac = "9C:05:D6:F4:E3:3E";
+            ip = "192.168.127.20";
+            name = "switch";
+          }
+          {
+            mac = "4c:77:cb:e9:a9:76";
+            ip = "192.168.127.30";
+            name = "beta-wlan";
+          }
+          {
+            mac = "4c:44:5b:89:2e:b1";
+            ip = "192.168.127.31";
+            name = "guppy-wlan";
+          }
+          {
+            mac = "7c:50:79:23:d8:68";
+            ip = "192.168.127.32";
+            name = "tetra-wlan";
+          }
+        ];
       };
       unifi = {
         enable = true;
-        address = "192.168.127.250/24";
+        address = "192.168.127.250";
       };
       home-assistant = {
         enable = true;
-        address = "192.168.127.40/24";
-      };
-      pihole = {
-        enable = true;
-        secretsFile = config.age.secrets.pihole.path;
-        dhcpRange = {
-          start = "192.168.127.100";
-          end = "192.168.127.200";
-        };
-        dhcpHosts = [
-          "EC:71:DB:D3:53:99,192.168.127.50,reolink"
-          "78:8A:20:D9:69:1F,192.168.127.22,ap-upstairs"
-          "24:5A:4C:11:C5:1C,192.168.127.21,ap-main"
-          "9C:05:D6:F4:E3:3E,192.168.127.20,switch"
-          "4c:77:cb:e9:a9:76,192.168.127.30,beta-wlan"
-          "4c:44:5b:89:2e:b1,192.168.127.31,guppy-wlan"
-          "7c:50:79:23:d8:68,192.168.127.32,tetra-wlan"
-        ];
-        dnsHosts = [
-          "192.168.127.10 beta"
-          "192.168.127.11 guppy"
-          "192.168.127.12 tetra"
-        ];
+        address = "192.168.127.40";
       };
       homeAssistant = {
         enable = true;

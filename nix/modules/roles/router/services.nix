@@ -1,6 +1,5 @@
 {
   lib,
-  pkgs,
   config,
   ...
 }:
@@ -9,83 +8,9 @@
     ./unifi.nix
   ];
 
-  virtualisation.podman =
-    lib.mkIf (config.router.services.pihole.enable || config.router.services.homeAssistant.enable)
-      {
-        enable = true;
-        dockerCompat = true;
-      };
-
-  # Firewall rules for router services
-  # Note: lan and tailscale0 are already in trustedInterfaces (networking.nix)
-  # so these rules are redundant but kept for explicitness
-  networking.firewall.interfaces.vm--lan.allowedTCPPorts =
-    (lib.optionals config.router.services.pihole.enable [ 80 ])
-    ++ (lib.optionals config.router.services.homeAssistant.enable [ 8123 ]);
-
-  networking.firewall.interfaces.mv-lan.allowedUDPPorts =
-    lib.optionals config.router.services.pihole.enable
-      [
-        53
-        67
-        68
-      ];
-
-  networking.firewall.interfaces.tailscale0.allowedTCPPorts =
-    (lib.optionals config.router.services.pihole.enable [ 80 ])
-    ++ (lib.optionals config.router.services.homeAssistant.enable [ 8123 ]);
-
-  networking.firewall.interfaces.tailscale0.allowedUDPPorts =
-    lib.optionals config.router.services.pihole.enable
-      [
-        53
-        67
-        68
-      ];
-
-  virtualisation.oci-containers.containers.pihole = lib.mkIf config.router.services.pihole.enable {
-    image = "pihole/pihole:latest";
-    extraOptions = [
-      "--memory=256m"
-      "--dns=1.1.1.1"
-    ];
-    networks = [ "host" ];
-    privileged = true;
-    environmentFiles = [
-      config.router.services.pihole.secretsFile
-    ];
-    environment = {
-      FTLCONF_misc_etc_dnsmasq_d = "true";
-      FTLCONF_dns_upstreams = config.router.services.pihole.upstreams;
-      FTLCONF_dns_blocking_mode = "NODATA";
-      FTLCONF_dns_interface = "mv-lan-bridge";
-      FTLCONF_dns_listeningMode = "BIND";
-      FTLCONF_dns_bogusPriv = "true";
-      FTLCONF_dns_domainNeeded = "true";
-      FTLCONF_dns_expandHosts = "true";
-      FTLCONF_dns_hosts = lib.concatStringsSep ";" config.router.services.pihole.dnsHosts;
-      FTLCONF_dhcp_active = "true";
-      FTLCONF_dhcp_ipv6 = "true";
-      FTLCONF_dhcp_rapidCommit = "true";
-      FTLCONF_dhcp_start = config.router.services.pihole.dhcpRange.start;
-      FTLCONF_dhcp_end = config.router.services.pihole.dhcpRange.end;
-      FTLCONF_dhcp_router = config.router.lan.address;
-      FTLCONF_dhcp_hosts = lib.concatStringsSep ";" config.router.services.pihole.dhcpHosts;
-    };
-    volumes = [
-      "/etc/pihole:/etc/pihole"
-      # Mount the custom config to force specific interface binding
-      "${pkgs.writeText "99-interfaces.conf" ''
-        interface=lo
-        interface=tailscale0
-        interface=mv-lan-bridge
-        bind-interfaces
-      ''}:/etc/dnsmasq.d/99-interfaces.conf"
-    ];
-  };
-  systemd.services.podman-pihole = {
-    requires = [ "tailscaled.service" ];
-    after = [ "tailscaled.service" ];
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
   };
 
   virtualisation.oci-containers.containers.matter-server =

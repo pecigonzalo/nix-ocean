@@ -27,7 +27,7 @@
             "lan" = {
               matchConfig.Name = "mv-lan";
               linkConfig.RequiredForOnline = "routable";
-              address = [ config.router.services.dns.address ];
+              address = [ "${config.router.services.dns.address}/24" ];
               gateway = [ config.router.lan.address ];
             };
           };
@@ -52,22 +52,34 @@
           settings = {
             dns = {
               bootstrap_dns = config.router.services.dns.upstreams;
-              upstream_dns = config.router.services.dns.upstreams;
+              upstream_dns = [
+                "[/home/]${config.router.services.dhcp.address}"
+              ]
+              ++ config.router.services.dns.upstreams;
+
+              private_networks = [ "192.168.127.0/24" ]; # TODO: Move to var
+              use_private_ptr_resolvers = true;
+              local_ptr_upstreams = [ config.router.services.dhcp.address ];
+
+              hostsfile_enabled = false;
+            };
+            clients = {
+              runtime_sources = {
+                hosts = false;
+              };
             };
             dhcp = {
               enabled = false;
-              dhcpv4 = {
-                gateway_ip = config.router.lan.address;
-                subnet_mask = "255.255.255.0";
-                range_start = config.router.services.dhcp.start;
-                range_end = config.router.services.dhcp.end;
-              };
-              local_domain_name = "lan";
             };
             filtering = {
               protection_enabled = true;
               filtering_enabled = true;
               parental_enabled = false;
+              rewrites = map (host: {
+                answer = host.ip;
+                domain = "${host.name}.home";
+                type = "A";
+              }) config.router.services.dns.dnsHosts;
             };
             filters =
               map
@@ -76,7 +88,34 @@
                   url = url;
                 })
                 [
-                  "https://adguardteam.github.io/HostlistsRegistry/assets/filter_9.txt"
+                  "https://adaway.org/hosts.txt"
+                  "https://bitbucket.org/ethanr/dns-blacklists/raw/8575c9f96e5b4a1308f2f12394abd86d0927a4a0/bad_lists/Mandiant_APT1_Report_Appendix_D.txt"
+                  "https://gitlab.com/quidsup/notrack-blocklists/raw/master/notrack-malware.txt"
+                  "https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt"
+                  "https://lists.cyberhost.uk/malware.txt"
+                  "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext"
+                  "https://phishing.army/download/phishing_army_blocklist_extended.txt"
+                  "https://raw.githubusercontent.com/AssoEchap/stalkerware-indicators/master/generated/hosts"
+                  "https://raw.githubusercontent.com/DandelionSprout/adfilt/master/Alternate%20versions%20Anti-Malware%20List/AntiMalwareHosts.txt"
+                  "https://raw.githubusercontent.com/FadeMind/hosts.extras/master/UncheckyAds/hosts"
+                  "https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.2o7Net/hosts"
+                  "https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.Risk/hosts"
+                  "https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.Spam/hosts"
+                  "https://raw.githubusercontent.com/PolishFiltersTeam/KADhosts/master/KADhosts.txt"
+                  "https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt"
+                  "https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt"
+                  "https://raw.githubusercontent.com/bigdargon/hostsVN/master/hosts"
+                  "https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt"
+                  "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.plus.txt"
+                  "https://urlhaus.abuse.ch/downloads/hostfile/"
+                  "https://v.firebog.net/hosts/AdguardDNS.txt"
+                  "https://v.firebog.net/hosts/Admiral.txt"
+                  "https://v.firebog.net/hosts/Easylist.txt"
+                  "https://v.firebog.net/hosts/Easyprivacy.txt"
+                  "https://v.firebog.net/hosts/Prigent-Ads.txt"
+                  "https://v.firebog.net/hosts/Prigent-Crypto.txt"
+                  "https://v.firebog.net/hosts/RPiList-Malware.txt"
+                  "https://v.firebog.net/hosts/static/w3kbl.txt"
                 ];
           };
         };

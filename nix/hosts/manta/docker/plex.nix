@@ -29,10 +29,12 @@
     # };
     plex-tunnel = {
       image = "ghcr.io/tailscale/tailscale:latest";
+      environmentFiles = [
+        config.age.secrets.tailscale-proxy.path
+      ];
       environment = {
         TS_STATE_DIR = "/var/lib/tailscale";
         TS_SOCKET = "/var/run/tailscale/tailscaled.sock";
-        TS_AUTHKEY = "tskey-auth-khwrSD37p321CNTRL-7w7YSm8HM34yHyHTszjA94Xzsz3rmf1W1";
         TS_EXTRA_ARGS = "--exit-node=100.112.15.102 --accept-routes --accept-dns --exit-node-allow-lan-access";
         TS_HOSTNAME = "plex-proxy";
         TS_AUTH_ONCE = "true";

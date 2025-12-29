@@ -36,7 +36,7 @@
             "lan" = {
               matchConfig.Name = "mv-lan";
               linkConfig.RequiredForOnline = "routable";
-              address = [ config.router.services.unifi.address ];
+              address = [ "${config.router.services.unifi.address}/24" ];
               gateway = [ config.router.lan.address ];
             };
           };
