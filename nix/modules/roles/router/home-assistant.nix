@@ -18,6 +18,7 @@
 
     # Mount Zigbee USB device
     bindMounts = lib.optionalAttrs (config.router.services.home-assistant.zigbeeDevice != null) {
+      "/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
       "/dev/ttyACM0" = {
         hostPath = config.router.services.home-assistant.zigbeeDevice;
         isReadOnly = false;
