@@ -1,4 +1,5 @@
 {
+  agenix,
   config,
   lib,
   pkgs,
@@ -36,8 +37,19 @@
         };
       in
       {
-        imports = [ ../../common/server-tools.nix ];
+        imports = [
+          agenix.nixosModules.default
+          ../../common/server-tools.nix
+        ];
         system.stateVersion = "25.05";
+
+        age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+        # Agenix secrets from separate repository
+        # NOTE: This is not not nice and its breaking the interface of the module
+        age.secrets = {
+          tailscale.file = config.age.secrets.tailscale.file;
+        };
+
         networking = {
           useDHCP = false;
           useNetworkd = true;
@@ -54,6 +66,14 @@
               gateway = [ config.router.lan.address ];
             };
           };
+        };
+
+        services.tailscale = {
+          enable = true;
+          extraSetFlags = [
+            "--accept-dns=false"
+          ];
+          authKeyFile = "/run/agenix/tailscale";
         };
 
         services.home-assistant = {
