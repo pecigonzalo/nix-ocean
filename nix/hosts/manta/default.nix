@@ -32,18 +32,9 @@
     fsType = "ext4";
   };
 
-  age.secrets.tailscale = {
-    file = "${secrets}/tailscale.age";
-    owner = "root";
-    group = "root";
-    mode = "400";
-  };
-  age.secrets.tailscale-proxy = {
-    file = "${secrets}/tailscale-proxy.age";
-    owner = "root";
-    group = "root";
-    mode = "400";
-  };
+  age.secrets.tailscale.file = "${secrets}/tailscale.age";
+  age.secrets.tailscale-proxy.file = "${secrets}/tailscale-proxy.age";
+  age.secrets.authelia-users.file = "${secrets}/authelia-users.age";
 
   boot = {
     swraid.enable = true;

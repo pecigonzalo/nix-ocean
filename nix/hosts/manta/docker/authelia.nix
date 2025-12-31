@@ -1,27 +1,12 @@
 {
-  lib,
+  config,
   pkgs,
   proxied,
   ...
 }:
 let
   yamlFormat = pkgs.formats.yaml { };
-  autheliaUsers = yamlFormat.generate "authelia-users.yml" {
-    users = {
-      weedv2 = {
-        displayname = "Gonzalo";
-        password = "$argon2id$v=19$m=1048576,t=1,p=8$N3VWY3pSTnMwWjZqd0VjQw$9JNHSWeW1WHpJxZoZS3jWAs5gG6fARzz5sp9/8MSry8";
-        email = "weedv2@gmail.com";
-        groups = [ "admins" ];
-      };
-      juliberas = {
-        displayname = "Julieta";
-        password = "$argon2id$v=19$m=65536,t=3,p=4$kjRe16hnpSmOFWnIOpoHXw$cDZmVCifihhOm0Q1xlQlV/J9+W6lXjc3RYdatp5Zxh0";
-        email = "juliberas@outlook.com";
-        groups = [ "users" ];
-      };
-    };
-  };
+  autheliaUsers = config.age.secrets.authelia-users.path;
   autheliaConfig = yamlFormat.generate "configuration.yml" {
     server = {
       host = "0.0.0.0";
