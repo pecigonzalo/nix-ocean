@@ -45,7 +45,7 @@
         "--ip=172.21.0.150"
         "--network=proxy"
         "--cap-add=NET_ADMIN"
-        "--dns=100.112.15.102"
+        "--dns=100.101.146.118"
       ];
     };
     plex-proxy = {
