@@ -32,13 +32,11 @@
         };
         systemd.network = {
           enable = true;
-          networks = {
-            "lan" = {
-              matchConfig.Name = "mv-lan";
-              linkConfig.RequiredForOnline = "routable";
-              address = [ "${config.router.services.unifi.address}/24" ];
-              gateway = [ config.router.lan.address ];
-            };
+          networks."10-lan" = {
+            matchConfig.Name = "mv-lan";
+            linkConfig.RequiredForOnline = "routable";
+            address = [ "${config.router.services.unifi.address}/24" ];
+            gateway = [ config.router.lan.address ];
           };
         };
         networking.firewall.allowedTCPPorts = [

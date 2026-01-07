@@ -55,7 +55,6 @@
 
   systemd.network.networks."10-mv-lan-bridge" = {
     matchConfig.Name = "mv-lan-bridge";
-
     linkConfig.RequiredForOnline = "routable";
 
     address = [ "${config.router.lan.address}/${toString config.router.lan.prefixLength}" ];
@@ -69,7 +68,6 @@
   # Attach LAN interface to MACVLAN bridge
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "lan";
-
     linkConfig.RequiredForOnline = "carrier";
 
     networkConfig = {
