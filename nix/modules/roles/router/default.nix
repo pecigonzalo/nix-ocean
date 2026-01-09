@@ -141,10 +141,4 @@
       };
     };
   };
-
-  config = {
-    powerManagement = {
-      cpuFreqGovernor = "performance";
-    };
-  };
 }
