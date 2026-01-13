@@ -128,7 +128,8 @@
       ExecStart = pkgs.writeScript "enable-sqm" ''
         #!${pkgs.bash}/bin/bash
 
-        IFACE="wan" 
+        WAN_IFACE="wan"
+        LAN_IFACE="lan"
 
         # Set to 90-95% of your real speed to ensure the queue stays in router
         # Example: 1Gbps link -> 900mbit or 920mbit
@@ -143,25 +144,26 @@
         ${pkgs.iproute2}/bin/ip link set dev ifb0 up
 
         # Force disable LRO/GRO on the physical WAN to ensure accurate shaping
-        ${pkgs.ethtool}/bin/ethtool -K $IFACE gro off gso off tso off lro off 2>/dev/null || true
+        ${pkgs.ethtool}/bin/ethtool -K $WAN_IFACE gro off gso off tso off lro off 2>/dev/null || true
+        ${pkgs.ethtool}/bin/ethtool -K $LAN_IFACE gro off gso off tso off lro off 2>/dev/null || true
 
         # Bring ifb0 up
         ${pkgs.iproute2}/bin/ip link set dev ifb0 up
 
         # Cleanup
-        ${pkgs.iproute2}/bin/tc qdisc del dev $IFACE root 2>/dev/null || true
-        ${pkgs.iproute2}/bin/tc qdisc del dev $IFACE ingress 2>/dev/null || true
+        ${pkgs.iproute2}/bin/tc qdisc del dev $WAN_IFACE root 2>/dev/null || true
+        ${pkgs.iproute2}/bin/tc qdisc del dev $WAN_IFACE ingress 2>/dev/null || true
         ${pkgs.iproute2}/bin/tc qdisc del dev ifb0 root 2>/dev/null || true
 
         # Upload
-        ${pkgs.iproute2}/bin/tc qdisc add dev $IFACE root cake bandwidth $UL_SPEED besteffort nat
+        ${pkgs.iproute2}/bin/tc qdisc add dev $WAN_IFACE root cake bandwidth $UL_SPEED nat
 
         # Download
-        ${pkgs.iproute2}/bin/tc qdisc add dev $IFACE handle ffff: ingress
-        ${pkgs.iproute2}/bin/tc qdisc add dev ifb0 root cake bandwidth $DL_SPEED besteffort nat
+        ${pkgs.iproute2}/bin/tc qdisc add dev $WAN_IFACE handle ffff: ingress
+        ${pkgs.iproute2}/bin/tc qdisc add dev ifb0 root cake bandwidth $DL_SPEED nat wash ingress
 
         # Redirect Ingress -> IFB0
-        ${pkgs.iproute2}/bin/tc filter add dev $IFACE parent ffff: matchall action mirred egress redirect dev ifb0
+        ${pkgs.iproute2}/bin/tc filter add dev $WAN_IFACE parent ffff: matchall action mirred egress redirect dev ifb0
       '';
     };
   };
