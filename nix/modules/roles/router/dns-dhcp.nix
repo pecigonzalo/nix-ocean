@@ -125,6 +125,7 @@ in
                 "[/${localDnsNetwork}/]127.0.0.1:5353"
               ]
               ++ config.router.services.dns.upstreams;
+              upstream_mode = "parallel";
 
               private_networks = [ "192.168.127.0/24" ]; # TODO: Move to var
               use_private_ptr_resolvers = true;
