@@ -131,6 +131,9 @@ in
               use_private_ptr_resolvers = true;
               local_ptr_upstreams = [ "127.0.0.1:5353" ];
 
+              cache_enabled = true;
+              cache_size = 256 * 1024; # 256 MB
+
               hostsfile_enabled = false;
             };
             clients = {
@@ -142,6 +145,7 @@ in
               enabled = false;
             };
             filtering = {
+              blocking_mode = "nxdomain";
               protection_enabled = true;
               filtering_enabled = true;
               parental_enabled = false;
