@@ -102,9 +102,9 @@
         end = "192.168.127.200";
         dhcpHosts = [
           {
-            mac = "EC:71:DB:D3:53:99";
-            ip = "192.168.127.50";
-            name = "reolink";
+            mac = "24:5A:4C:11:C5:1C";
+            ip = "192.168.127.21";
+            name = "ap-main";
           }
           {
             mac = "78:8A:20:D9:69:1F";
@@ -112,9 +112,9 @@
             name = "ap-upstairs";
           }
           {
-            mac = "24:5A:4C:11:C5:1C";
-            ip = "192.168.127.21";
-            name = "ap-main";
+            mac = "6C:63:F8:4E:F0:C9";
+            ip = "192.168.127.23";
+            name = "ap-big-main";
           }
           {
             mac = "9C:05:D6:F4:E3:3E";
@@ -135,6 +135,11 @@
             mac = "7c:50:79:23:d8:68";
             ip = "192.168.127.32";
             name = "tetra-wlan";
+          }
+          {
+            mac = "EC:71:DB:D3:53:99";
+            ip = "192.168.127.50";
+            name = "reolink";
           }
         ];
       };

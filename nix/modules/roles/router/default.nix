@@ -9,6 +9,7 @@
     ./dns-dhcp.nix
     ./unifi.nix
     ./home-assistant.nix
+    ./observability.nix
   ];
 
   options = {
