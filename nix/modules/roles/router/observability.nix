@@ -41,6 +41,7 @@ in
   };
   services.prometheus = {
     enable = true;
+    retentionTime = "30d";
     scrapeConfigs = [
       {
         job_name = "blackbox_icmp";
