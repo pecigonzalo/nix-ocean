@@ -17,7 +17,7 @@
     memoryLimit = "1G";
 
     # Mount Zigbee USB device
-    bindMounts = lib.optionalAttrs (config.router.services.home-assistant.zigbeeDevice != null) {
+    bindMounts = {
       "/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
       "/dev/ttyACM0" = {
         hostPath = config.router.services.home-assistant.zigbeeDevice;
@@ -119,9 +119,9 @@
               themes = "!include_dir_merge_named themes";
             };
 
-            automation = "!include /etc/home-assistant/automations.yaml";
-            script = "!include /etc/home-assistant/scripts.yaml";
-            scene = "!include /etc/home-assistant/scenes.yaml";
+            automation = "!include automations.yaml";
+            script = "!include scripts.yaml";
+            scene = "!include scenes.yaml";
 
             homeassistant = {
               name = "home";
