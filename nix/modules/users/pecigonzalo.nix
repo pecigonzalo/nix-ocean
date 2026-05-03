@@ -17,10 +17,22 @@
     home.stateVersion = "22.05";
     programs.ssh = {
       enable = true;
-      compression = true;
+      enableDefaultConfig = false;
       includes = [
         "*.config"
       ];
+      matchBlocks."*" = {
+        forwardAgent = false;
+        addKeysToAgent = "no";
+        compression = true;
+        serverAliveInterval = 0;
+        serverAliveCountMax = 3;
+        hashKnownHosts = false;
+        userKnownHostsFile = "~/.ssh/known_hosts";
+        controlMaster = "no";
+        controlPath = "~/.ssh/master-%r@%n:%p";
+        controlPersist = "no";
+      };
     };
     programs.tmux.enable = true;
     programs.fish.enable = true;
