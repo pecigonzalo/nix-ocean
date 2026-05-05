@@ -108,6 +108,8 @@
             "roborock"
             "reolink"
             "cast"
+            "apple_tv"
+            "androidtv_remote"
           ];
           customComponents = with pkgs-unstable.home-assistant-custom-components; [
             alarmo
