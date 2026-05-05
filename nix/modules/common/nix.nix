@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, pkgs, config, ... }:
 let
   inherit (lib) mkOption types;
   nixCfg = config.ocean.nix;
@@ -80,7 +80,7 @@ in
     # Allow unfree packages (useful for firmware, drivers)
     nixpkgs.config.allowUnfree = true;
 
-    # Use the latest Linux kernel LTS
-    # boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest; # Commented out - keep stable by default
+    # Pin to a patched stable kernel series for copy.fail / CVE-2026-31431.
+    boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_6_18;
   };
 }
