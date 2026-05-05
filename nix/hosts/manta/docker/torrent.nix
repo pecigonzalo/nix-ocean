@@ -34,5 +34,22 @@ in
         ];
       };
     };
+    qui = proxied {
+      name = "qui";
+      port = 7476;
+      host = "qui";
+      container = {
+        image = "ghcr.io/autobrr/qui:v1.14";
+        ports = [
+          "7476:7476"
+        ];
+        extraOptions = [
+          "--memory=1G"
+        ];
+        volumes = [
+          "/data/containers/qui/config:/config"
+        ];
+      };
+    };
   };
 }
