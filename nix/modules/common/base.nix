@@ -21,6 +21,7 @@
           "aes128-gcm@openssh.com"
         ];
         KexAlgorithms = [
+          "mlkem768x25519-sha256"
           "curve25519-sha256"
           "curve25519-sha256@libssh.org"
           "diffie-hellman-group16-sha512"
