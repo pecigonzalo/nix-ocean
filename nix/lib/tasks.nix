@@ -104,6 +104,7 @@ let
   taskfileApp = {
     type = "app";
     program = "${taskfilePackage}/bin/task";
+    meta.description = "Task wrapper for repository automation commands";
   };
 in
 {
