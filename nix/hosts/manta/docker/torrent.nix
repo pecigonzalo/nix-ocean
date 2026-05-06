@@ -40,9 +40,10 @@ in
       host = "qui";
       container = {
         image = "ghcr.io/autobrr/qui:v1.14";
-        ports = [
-          "7476:7476"
-        ];
+        environment = {
+          QUI__AUTH_DISABLED = "true";
+          QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA = "true";
+        };
         extraOptions = [
           "--memory=1G"
         ];
