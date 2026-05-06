@@ -1,6 +1,6 @@
 { config, proxied, ... }:
 let
-  ghost_db_password = "ab0ddc68f8af49cdc11e98d1f9945f8c47a4044c402ffacbadfff686f5dc7ca8";
+  ghost_db_password = config.age.secrets.ghost-db-password.path;
 in
 {
   virtualisation.oci-containers.containers = {
@@ -27,10 +27,11 @@ in
       image = "mariadb:10";
       environment = {
         MARIADB_DATABASE = "ghost";
-        MARIADB_ROOT_PASSWORD = ghost_db_password;
+        MARIADB_ROOT_PASSWORD_FILE = "/secrets/db-password";
       };
       volumes = [
         "/data/containers/ghost-db/config:/config"
+        "${ghost_db_password}:/secrets/db-password:ro"
       ];
       extraOptions = [
         "--pull=always"

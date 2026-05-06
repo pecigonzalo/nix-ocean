@@ -38,6 +38,10 @@
   age.secrets.authelia-jwt-secret.file = "${secrets}/authelia-jwt-secret.age";
   age.secrets.authelia-storage-key.file = "${secrets}/authelia-storage-key.age";
   age.secrets.wordpress-db-password.file = "${secrets}/wordpress-db-password.age";
+  age.secrets.grafana-prometheus-token.file = "${secrets}/grafana-prometheus-token.age";
+  age.secrets.grafana-logs-token.file = "${secrets}/grafana-logs-token.age";
+  age.secrets.plex-claim.file = "${secrets}/plex-claim.age";
+  age.secrets.ghost-db-password.file = "${secrets}/ghost-db-password.age";
 
   boot = {
     swraid.enable = true;
