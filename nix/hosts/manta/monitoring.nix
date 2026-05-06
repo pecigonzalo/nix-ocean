@@ -1,4 +1,5 @@
-{ config, ... }: {
+{ config, ... }:
+{
   services.cadvisor = {
     enable = true;
     port = 9101;
@@ -16,19 +17,26 @@
     };
     scrapeConfigs = [
       {
-        job_name = "node";
-        static_configs = [{
-          targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ];
-        }];
+        job_name = "integrations/node_exporter";
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ];
+          }
+        ];
         relabel_configs = [
-          { replacement = config.networking.hostName; target_label = "instance"; }
+          {
+            replacement = config.networking.hostName;
+            target_label = "instance";
+          }
         ];
       }
       {
-        job_name = "cadvisor";
-        static_configs = [{
-          targets = [ "127.0.0.1:${toString config.services.cadvisor.port}" ];
-        }];
+        job_name = "integrations/docker";
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:${toString config.services.cadvisor.port}" ];
+          }
+        ];
       }
     ];
     remoteWrite = [
@@ -57,34 +65,36 @@
         };
       };
 
-      scrape_configs = [{
-        job_name = "journal";
-        journal = {
-          max_age = "24h";
-          labels = {
-            job = "integrations/node_exporter";
-            instance = "hostname";
+      scrape_configs = [
+        {
+          job_name = "journal";
+          journal = {
+            max_age = "24h";
+            labels = {
+              job = "integrations/node_exporter";
+              instance = "hostname";
+            };
           };
-        };
-        relabel_configs = [
-          {
-            source_labels = [ "__journal__systemd_unit" ];
-            target_label = "unit";
-          }
-          {
-            source_labels = [ "__journal__boot_id" ];
-            target_label = "boot_id";
-          }
-          {
-            source_labels = [ "__journal__transport" ];
-            target_label = "transport";
-          }
-          {
-            source_labels = [ "__journal_priority_keyword" ];
-            target_label = "level";
-          }
-        ];
-      }];
+          relabel_configs = [
+            {
+              source_labels = [ "__journal__systemd_unit" ];
+              target_label = "unit";
+            }
+            {
+              source_labels = [ "__journal__boot_id" ];
+              target_label = "boot_id";
+            }
+            {
+              source_labels = [ "__journal__transport" ];
+              target_label = "transport";
+            }
+            {
+              source_labels = [ "__journal_priority_keyword" ];
+              target_label = "level";
+            }
+          ];
+        }
+      ];
     };
   };
 }
