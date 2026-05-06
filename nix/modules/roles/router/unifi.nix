@@ -1,7 +1,6 @@
 {
   config,
-  pkgs,
-  nixpkgs-unstable,
+  pkgs-unstable,
   ...
 }:
 {
@@ -11,15 +10,15 @@
     macvlans = [ "lan" ];
     privateNetwork = true;
     memoryLimit = "1G";
+    specialArgs = {
+      inherit pkgs-unstable;
+    };
 
     config =
-      { ... }:
-      let
-        pkgs-unstable = import nixpkgs-unstable {
-          system = pkgs.stdenv.hostPlatform.system;
-          config.allowUnfree = true;
-        };
-      in
+      {
+        pkgs-unstable,
+        ...
+      }:
       {
         imports = [ ../../common/server-tools.nix ];
         system.stateVersion = "25.05";
@@ -47,7 +46,8 @@
           enable = true;
           openFirewall = true;
           unifiPackage = pkgs-unstable.unifi;
-          mongodbPackage = pkgs.mongodb; # stable 7.0 - migration step from 6.x
+          # FCV was migrated to 8.0 on 2026-05-06; keep Mongo on mongodb-ce (8.x).
+          mongodbPackage = pkgs-unstable.mongodb-ce;
           jrePackage = pkgs-unstable.jdk25_headless;
         };
       };

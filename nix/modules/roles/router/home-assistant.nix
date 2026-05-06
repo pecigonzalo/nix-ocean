@@ -2,8 +2,7 @@
   agenix,
   config,
   lib,
-  pkgs,
-  nixpkgs-unstable,
+  pkgs-unstable,
   ...
 }:
 {
@@ -13,6 +12,9 @@
     macvlans = [ "lan" ];
     privateNetwork = true;
     enableTun = true;
+    specialArgs = {
+      inherit pkgs-unstable;
+    };
 
     memoryLimit = "1G";
 
@@ -32,13 +34,7 @@
     ];
 
     config =
-      { ... }:
-      let
-        pkgs-unstable = import nixpkgs-unstable {
-          system = pkgs.stdenv.hostPlatform.system;
-          config.allowUnfree = true;
-        };
-      in
+      { pkgs-unstable, ... }:
       {
         imports = [
           agenix.nixosModules.default

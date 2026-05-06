@@ -83,9 +83,17 @@
       # Build a NixOS system configuration
       mkHost =
         name: cfg:
+        let
+          hostSystem = cfg.system or "x86_64-linux";
+          pkgs-unstable = import nixpkgs-unstable {
+            system = hostSystem;
+            config.allowUnfree = true;
+          };
+        in
         lib.nixosSystem {
+          system = hostSystem;
           specialArgs = {
-            inherit nixpkgs-unstable;
+            inherit pkgs-unstable;
             inherit agenix;
             inherit secrets;
           };
