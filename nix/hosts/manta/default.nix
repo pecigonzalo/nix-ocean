@@ -35,6 +35,9 @@
   age.secrets.tailscale.file = "${secrets}/tailscale.age";
   age.secrets.tailscale-proxy.file = "${secrets}/tailscale-proxy.age";
   age.secrets.authelia-users.file = "${secrets}/authelia-users.age";
+  age.secrets.authelia-jwt-secret.file = "${secrets}/authelia-jwt-secret.age";
+  age.secrets.authelia-storage-key.file = "${secrets}/authelia-storage-key.age";
+  age.secrets.wordpress-db-password.file = "${secrets}/wordpress-db-password.age";
 
   boot = {
     swraid.enable = true;

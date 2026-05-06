@@ -7,6 +7,8 @@
 let
   yamlFormat = pkgs.formats.yaml { };
   autheliaUsers = config.age.secrets.authelia-users.path;
+  autheliaJwtSecret = config.age.secrets.authelia-jwt-secret.path;
+  autheliaStorageKey = config.age.secrets.authelia-storage-key.path;
   autheliaConfig = yamlFormat.generate "configuration.yml" {
     server = {
       host = "0.0.0.0";
@@ -16,7 +18,6 @@ let
     log = {
       level = "info";
     };
-    jwt_secret = "ThisRandomSecret!";
 
     totp = {
       issuer = "auth.julesinabox.com";
@@ -55,7 +56,6 @@ let
       ban_time = "5m";
     };
     storage = {
-      encryption_key = "enamor-debunk-toggle-peruse";
       local = {
         path = "/config/db.sqlite3";
       };
@@ -76,6 +76,10 @@ in
       auth = false;
       container = {
         image = "authelia/authelia:4";
+        environment = {
+          AUTHELIA_JWT_SECRET_FILE = "/secrets/jwt-secret";
+          AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/secrets/storage-key";
+        };
         extraOptions = [
           "--label=traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.munin.xyz/"
           "--label=traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
@@ -86,6 +90,8 @@ in
           "/data/containers/authelia:/config"
           "${autheliaConfig}:/config/configuration.yml"
           "${autheliaUsers}:/config/users.yml"
+          "${autheliaJwtSecret}:/secrets/jwt-secret:ro"
+          "${autheliaStorageKey}:/secrets/storage-key:ro"
         ];
       };
     };
