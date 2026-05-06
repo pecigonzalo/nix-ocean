@@ -47,7 +47,8 @@
           enable = true;
           openFirewall = true;
           unifiPackage = pkgs-unstable.unifi;
-          mongodbPackage = pkgs-unstable.mongodb-ce;
+          mongodbPackage = pkgs.mongodb; # stable 7.0 - migration step from 6.x
+          jrePackage = pkgs-unstable.jdk25_headless;
         };
       };
   };
