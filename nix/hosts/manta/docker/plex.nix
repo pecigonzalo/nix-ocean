@@ -73,20 +73,22 @@
         environment = {
           PLEX_GID = toString config.users.groups.media.gid;
           PLEX_UID = toString config.users.users.media.uid;
-          PLEX_CLAIM = "claim-kVPC3fbsj75x1Vr2xCAL";
           CHANGE_CONFIG_DIR_OWNERSHIP = "false";
           ADVERTISE_IP = "https://plex.munin.xyz";
         };
+        environmentFiles = [
+          config.age.secrets.plex-claim.path
+        ];
         extraOptions = [
           "--device=/dev/dri/renderD128:/dev/dri/renderD128"
           "--device=/dev/dri/card0:/dev/dri/card0"
           "--add-host=plex.tv:172.21.0.150"
           "--memory=8G"
+          "--tmpfs=/transcode:size=6g,noexec,nodev,nosuid"
         ];
         volumes = [
           "/data/containers/plex/config:/config"
           "/data/media:/data/media"
-          "/dev/shm:/transcode"
         ];
       };
     };
