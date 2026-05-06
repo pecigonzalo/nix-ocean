@@ -2,6 +2,7 @@
 let
   julesinaboxDomain = "julesinabox.com";
   thekiwidiariesDomain = "thekiwidiaries.com";
+  wordpressDbPassword = config.age.secrets.wordpress-db-password.path;
 in
 {
   virtualisation.oci-containers.containers = {
@@ -10,10 +11,11 @@ in
       environment = {
         PUID = toString config.users.users.wordpress.uid;
         PGID = toString config.users.groups.wordpress.gid;
-        MYSQL_ROOT_PASSWORD = "wordpress";
+        FILE__MYSQL_ROOT_PASSWORD = "/secrets/db-password";
       };
       volumes = [
         "/data/containers/wordpress-db/config:/config"
+        "${wordpressDbPassword}:/secrets/db-password:ro"
       ];
       extraOptions = [
         "--pull=always"
