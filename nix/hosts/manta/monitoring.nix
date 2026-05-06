@@ -36,7 +36,7 @@
         url = "https://prometheus-prod-01-eu-west-0.grafana.net/api/prom/push";
         basic_auth = {
           username = "560743";
-          password = "glc_eyJvIjoiNzA0NjUxIiwibiI6InN0YWNrLTQyOTk4Ny1pbnRlZ3JhdGlvbi1uaXhmaXNoLXByb21ldGhldXMtbml4ZmlzaC1wcm9tZXRoZXVzIiwiayI6Imc4bjJTNDlCWjh3Mnc0NjhTVHI2VFdUTiIsIm0iOnsiciI6ImV1In19";
+          password_file = config.age.secrets.grafana-prometheus-token.path;
         };
       }
     ];
@@ -50,7 +50,11 @@
       };
 
       client = {
-        url = "https://279341:glc_eyJvIjoiNzA0NjUxIiwibiI6InN0YWNrLTQyOTk4Ny1pbnRlZ3JhdGlvbi1uaXhmaXNoLWxvZ3Mtbml4ZmlzaC1sb2dzIiwiayI6Ims3M0xIMTB1ODhhS2RlOEc0Nm83c0xZSyIsIm0iOnsiciI6ImV1In19@logs-prod-eu-west-0.grafana.net/api/prom/push";
+        url = "https://logs-prod-eu-west-0.grafana.net/api/prom/push";
+        basic_auth = {
+          username = "279341";
+          password_file = config.age.secrets.grafana-logs-token.path;
+        };
       };
 
       scrape_configs = [{
