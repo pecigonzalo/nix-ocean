@@ -51,6 +51,10 @@
             name = "mako.home";
           }
           {
+            target = config.router.services.syncthing.address;
+            name = "sync.home";
+          }
+          {
             target = config.router.services.dns.address;
             name = "dns.home";
           }
@@ -151,6 +155,10 @@
         enable = true;
         address = "192.168.127.40";
         zigbeeDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
+      };
+      syncthing = {
+        enable = true;
+        address = "192.168.127.60";
       };
     };
   };
