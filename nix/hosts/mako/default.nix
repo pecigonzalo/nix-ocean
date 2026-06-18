@@ -165,6 +165,10 @@
         restic.passwordFile = config.age.secrets.restic-password.path;
       };
     };
+    observability.speedtest = {
+      enable = true;
+      interval = "6h";
+    };
   };
 
   # State version

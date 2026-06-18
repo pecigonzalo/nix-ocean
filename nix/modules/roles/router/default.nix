@@ -10,6 +10,7 @@
     ./unifi.nix
     ./home-assistant.nix
     ./observability.nix
+    ./speedtest.nix
     ./backup.nix
   ];
 
