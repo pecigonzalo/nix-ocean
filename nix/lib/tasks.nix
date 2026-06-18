@@ -84,20 +84,12 @@ let
   };
 
   yamlFormat = pkgs.formats.yaml { };
+  taskfileYaml = yamlFormat.generate "Taskfile.yml" taskfile;
 
-  taskfilePackage = pkgs.stdenv.mkDerivation {
+  taskfilePackage = pkgs.writeShellApplication {
     name = "task";
-    taskfileYaml = yamlFormat.generate "Taskfile.yml" taskfile;
-    dontUnpack = true;
-    installPhase = ''
-      mkdir -p $out/share/taskfiles $out/bin
-      cp "$taskfileYaml" $out/share/taskfiles/Taskfile.yml
-      cat > $out/bin/task <<EOF
-        #!${pkgs.runtimeShell}
-        set -euo pipefail
-        exec ${pkgs.go-task}/bin/task -d ./ --taskfile "$out/share/taskfiles/Taskfile.yml" "\$@"
-      EOF
-      chmod +x $out/bin/task
+    text = ''
+      exec ${pkgs.go-task}/bin/task -d ./ --taskfile ${taskfileYaml} "$@"
     '';
   };
 
