@@ -23,6 +23,8 @@
   # Agenix secrets from separate repository
   age.secrets = {
     tailscale.file = "${secrets}/tailscale.age";
+    rclone-config.file = "${secrets}/rclone-config.age";
+    restic-password.file = "${secrets}/restic-password.age";
   };
 
   # Router configuration
@@ -51,7 +53,7 @@
             name = "mako.home";
           }
           {
-            target = config.router.services.syncthing.address;
+            target = config.router.services.backup.address;
             name = "sync.home";
           }
           {
@@ -156,9 +158,11 @@
         address = "192.168.127.40";
         zigbeeDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
-      syncthing = {
-        enable = true;
+      backup = {
+        enable = false;
         address = "192.168.127.60";
+        rclone.configFile = config.age.secrets.rclone-config.path;
+        restic.passwordFile = config.age.secrets.restic-password.path;
       };
     };
   };

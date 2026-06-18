@@ -10,7 +10,7 @@
     ./unifi.nix
     ./home-assistant.nix
     ./observability.nix
-    ./syncthing.nix
+    ./backup.nix
   ];
 
   options = {
@@ -139,13 +139,6 @@
             type = lib.types.nullOr lib.types.str;
             default = null;
             description = "Zigbee USB device path";
-          };
-        };
-        syncthing = {
-          enable = lib.mkEnableOption "Enable Syncthing encrypted bridge service";
-          address = lib.mkOption {
-            type = lib.types.str;
-            description = "Syncthing bridge address";
           };
         };
       };
