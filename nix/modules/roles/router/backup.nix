@@ -44,10 +44,12 @@ in
       };
 
       options = lib.mkOption {
-        type = lib.types.attrsOf (lib.types.oneOf [
-          lib.types.str
-          lib.types.bool
-        ]);
+        type = lib.types.attrsOf (
+          lib.types.oneOf [
+            lib.types.str
+            lib.types.bool
+          ]
+        );
         default = { };
         description = "Options passed to rclone by restic.";
       };

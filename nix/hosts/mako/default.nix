@@ -159,10 +159,11 @@
         zigbeeDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
       backup = {
-        enable = false;
+        enable = true;
         address = "192.168.127.60";
-        rclone.configFile = config.age.secrets.rclone-config.path;
+        restic.enable = false;
         restic.passwordFile = config.age.secrets.restic-password.path;
+        rclone.configFile = config.age.secrets.rclone-config.path;
       };
     };
     observability.speedtest = {
