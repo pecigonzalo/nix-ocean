@@ -83,6 +83,8 @@ in
         extraOptions = [
           "--label=traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.munin.xyz/"
           "--label=traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+          "--label=traefik.http.middlewares.authelia.forwardauth.maxBodySize=1048576"
+          "--label=traefik.http.middlewares.authelia.forwardauth.maxResponseBodySize=1048576"
           "--label=traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User, Remote-Groups, Remote-Name, Remote-Email"
           "--memory=2G"
         ];

@@ -49,11 +49,9 @@ in
             gateway = [ config.router.lan.address ];
           };
         };
-        services.resolved = {
+        services.resolved.settings.Resolve = {
           # Avoid port conflict with AdGuardHome
-          extraConfig = ''
-            DNSStubListener=no
-          '';
+          DNSStubListener = false;
         };
 
         networking.firewall.allowedTCPPorts = [
@@ -67,9 +65,8 @@ in
 
         services.tailscale = {
           enable = true;
-          extraSetFlags = [
-            "--accept-dns=false"
-          ];
+          extraUpFlags = [ "--accept-dns=false" ];
+          extraSetFlags = [ "--accept-dns=false" ];
           authKeyFile = "/run/agenix/tailscale";
         };
 

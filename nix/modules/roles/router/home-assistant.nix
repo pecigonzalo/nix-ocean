@@ -67,9 +67,8 @@
 
         services.tailscale = {
           enable = true;
-          extraSetFlags = [
-            "--accept-dns=false"
-          ];
+          extraUpFlags = [ "--accept-dns=false" ];
+          extraSetFlags = [ "--accept-dns=false" ];
           authKeyFile = "/run/agenix/tailscale";
         };
 

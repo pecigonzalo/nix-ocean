@@ -25,7 +25,7 @@ in
   ];
   virtualisation.oci-containers.containers = {
     traefik = {
-      image = "traefik:v2.8";
+      image = "traefik:v3.6";
       ports = [
         "80:80"
         "443:443"
@@ -44,7 +44,6 @@ in
         "--log.level=INFO"
         "--api=true"
         "--api.dashboard=true"
-        "--pilot.dashboard=false"
         "--global.sendAnonymousUsage=false"
         "--global.checkNewVersion=false"
         "--providers.docker=true"

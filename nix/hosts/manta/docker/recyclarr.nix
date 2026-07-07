@@ -3,6 +3,7 @@
   virtualisation.oci-containers.containers = {
     recyclarr = proxied {
       name = "recyclarr";
+      proxy = false;
       container = {
         image = "ghcr.io/recyclarr/recyclarr:latest";
         volumes = [

@@ -23,7 +23,7 @@ let
   };
 
   mkCmd = name: ''
-    ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild-ng \
+    ${pkgs.nixos-rebuild-ng}/bin/nixos-rebuild \
       --flake .#${name} \
       --target-host root@${name} \
       --build-host root@${name} \

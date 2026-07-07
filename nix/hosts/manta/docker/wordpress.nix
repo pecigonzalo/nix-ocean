@@ -1,8 +1,14 @@
-{ proxied, config, ... }:
+{
+  config,
+  lib,
+  proxied,
+  ...
+}:
 let
   julesinaboxDomain = "julesinabox.com";
   thekiwidiariesDomain = "thekiwidiaries.com";
   wordpressDbPassword = config.age.secrets.wordpress-db-password.path;
+  exposeWordpress = false;
 in
 {
   virtualisation.oci-containers.containers = {
@@ -27,6 +33,7 @@ in
 
     julesinabox = proxied {
       name = "julesinabox";
+      proxy = exposeWordpress;
       auth = false;
       container = {
         image = "wordpress:latest";
@@ -34,14 +41,14 @@ in
         volumes = [
           "/data/containers/wordpress/www/julesinabox:/var/www/html"
         ];
-        extraOptions = [
-          "--label=traefik.http.routers.julesinabox.rule=Host(`${julesinaboxDomain}`) || Host(`www.${julesinaboxDomain}`)"
-          "--memory=256M"
-        ];
+        extraOptions =
+          lib.optional exposeWordpress "--label=traefik.http.routers.julesinabox.rule=Host(`${julesinaboxDomain}`) || Host(`www.${julesinaboxDomain}`)"
+          ++ [ "--memory=256M" ];
       };
     };
     portfolio = proxied {
       name = "portfolio";
+      proxy = exposeWordpress;
       auth = false;
       container = {
         image = "wordpress:latest";
@@ -49,10 +56,9 @@ in
         volumes = [
           "/data/containers/wordpress/www/portfolio:/var/www/html"
         ];
-        extraOptions = [
-          "--label=traefik.http.routers.portfolio.rule=Host(`portfolio.${julesinaboxDomain}`) || Host(`www.portfolio.${julesinaboxDomain}`)"
-          "--memory=256M"
-        ];
+        extraOptions =
+          lib.optional exposeWordpress "--label=traefik.http.routers.portfolio.rule=Host(`portfolio.${julesinaboxDomain}`) || Host(`www.portfolio.${julesinaboxDomain}`)"
+          ++ [ "--memory=256M" ];
       };
     };
     # Temporary Disable

@@ -27,6 +27,9 @@ in
 
     settings = {
       server.http_addr = config.router.lan.address;
+      # Preserve the former NixOS Grafana default key after 26.05 removed it.
+      # Rotate this through agenix if Grafana starts storing sensitive secrets.
+      security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
 
       "auth.anonymous" = {
         enabled = true;
