@@ -92,7 +92,12 @@ in
               port = 5353;
 
               dhcp-authoritative = true;
-              dhcp-range = "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h";
+              dhcp-range = [
+                "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h"
+                "fd00:1000:1000:1::,ra-stateless,ra-names,12h"
+              ];
+              enable-ra = true;
+
               dhcp-option = [
                 "option:router,${config.router.lan.address}"
                 "option:dns-server,${config.router.services.dns.address}"

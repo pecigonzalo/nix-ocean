@@ -1,7 +1,6 @@
 {
   agenix,
   config,
-  lib,
   pkgs-unstable,
   ...
 }:
@@ -71,12 +70,15 @@
           useHostResolvConf = false;
           nameservers = config.router.services.dns.upstreams;
         };
+
         systemd.network = {
           enable = true;
           networks."10-lan" = {
             matchConfig.Name = "mv-lan";
             linkConfig.RequiredForOnline = "routable";
-            address = [ "${config.router.services."home-assistant".address}/24" ];
+            address = [
+              "${config.router.services."home-assistant".address}/24"
+            ];
             gateway = [ config.router.lan.address ];
           };
         };
@@ -99,10 +101,27 @@
             enable = true;
             userServices = true;
           };
+          reflector = true;
+          allowInterfaces = [
+            "mv-lan"
+            "wpan0"
+          ];
         };
 
         services.matter-server = {
           enable = true;
+          openFirewall = true;
+        };
+
+        systemd.services.matter-server = {
+          after = [
+            "network-online.target"
+            "otbr-agent.service"
+          ];
+          wants = [
+            "network-online.target"
+            "otbr-agent.service"
+          ];
         };
 
         services.openthread-border-router = {
