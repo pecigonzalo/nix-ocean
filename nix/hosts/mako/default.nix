@@ -156,7 +156,8 @@
       home-assistant = {
         enable = true;
         address = "192.168.127.40";
-        zigbeeDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
+        zigbeeDevice = "/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_ee67a22ffb21f0118098608fb887153e-if00-port0";
+        threadDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
       backup = {
         enable = true;

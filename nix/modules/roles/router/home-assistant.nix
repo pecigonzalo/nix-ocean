@@ -21,14 +21,30 @@
     # Mount Zigbee USB device
     bindMounts = {
       "/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
-      "/dev/ttyACM0" = {
+      "/dev/thread" = {
+        hostPath = config.router.services.home-assistant.threadDevice;
+        isReadOnly = false;
+      };
+      "/dev/zigbee" = {
         hostPath = config.router.services.home-assistant.zigbeeDevice;
+        isReadOnly = false;
+      };
+      "/dev/net/tun" = {
+        hostPath = "/dev/net/tun";
         isReadOnly = false;
       };
     };
     allowedDevices = [
       {
         node = "/dev/ttyACM0";
+        modifier = "rwm";
+      }
+      {
+        node = "/dev/ttyUSB0";
+        modifier = "rwm";
+      }
+      {
+        node = "/dev/net/tun";
         modifier = "rwm";
       }
     ];
@@ -72,6 +88,37 @@
           authKeyFile = "/run/agenix/tailscale";
         };
 
+        services.avahi = {
+          enable = true;
+          openFirewall = true;
+          ipv4 = true;
+          ipv6 = true;
+          nssmdns4 = true;
+          nssmdns6 = true;
+          publish = {
+            enable = true;
+            userServices = true;
+          };
+        };
+
+        services.matter-server = {
+          enable = true;
+        };
+
+        services.openthread-border-router = {
+          enable = true;
+
+          openFirewall = true;
+          backboneInterfaces = [ "mv-lan" ];
+
+          radio = {
+            device = "/dev/thread";
+            baudRate = 460800;
+            flowControl = true;
+          };
+        };
+
+        users.users.hass.extraGroups = [ "dialout" ];
         services.home-assistant = {
           enable = config.router.services."home-assistant".enable;
           package = pkgs-unstable.home-assistant;
@@ -137,21 +184,6 @@
           };
         };
 
-        services.avahi = {
-          enable = true;
-          ipv4 = true;
-          ipv6 = true;
-          nssmdns4 = true;
-          nssmdns6 = true;
-          publish = {
-            enable = true;
-            userServices = true;
-          };
-        };
-
-        services.matter-server = {
-          enable = true;
-        };
       };
   };
 }

@@ -136,6 +136,11 @@
             type = lib.types.str;
             description = "Unifi controller address";
           };
+          threadDevice = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Thread USB device path";
+          };
           zigbeeDevice = lib.mkOption {
             type = lib.types.nullOr lib.types.str;
             default = null;
