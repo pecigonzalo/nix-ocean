@@ -42,7 +42,7 @@
           useDHCP = false;
           useNetworkd = true;
           useHostResolvConf = false;
-          nameservers = config.router.services.dns.upstreams;
+          nameservers = [ config.router.services.dns.address ];
         };
 
         systemd.network = {
@@ -81,6 +81,11 @@
 
           openFirewall = true;
           backboneInterfaces = [ "mv-lan" ];
+
+          # otbr-agent's REST API defaults to 127.0.0.1, which is unreachable
+          # now that OTBR lives in its own container, separate from Home
+          # Assistant. Listen on all addresses so HA can reach it over the LAN.
+          rest.listenAddress = "::";
 
           radio = {
             device = "/dev/thread";

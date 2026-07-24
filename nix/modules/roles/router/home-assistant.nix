@@ -60,7 +60,7 @@
           useDHCP = false;
           useNetworkd = true;
           useHostResolvConf = false;
-          nameservers = config.router.services.dns.upstreams;
+          nameservers = [ config.router.services.dns.address ];
         };
 
         systemd.network = {
