@@ -43,7 +43,7 @@ in
         environment = {
           QUI__AUTH_DISABLED = "true";
           QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA = "true";
-           QUI__AUTH_DISABLED_ALLOWED_CIDRS = "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16";
+          QUI__AUTH_DISABLED_ALLOWED_CIDRS = "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16";
         };
         extraOptions = [
           "--memory=1G"
