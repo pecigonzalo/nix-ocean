@@ -9,6 +9,7 @@
     ./dns-dhcp.nix
     ./unifi.nix
     ./home-assistant.nix
+    ./thread.nix
     ./observability.nix
     ./speedtest.nix
     ./backup.nix
@@ -130,16 +131,23 @@
             description = "Unifi controller address";
           };
         };
+        thread = {
+          enable = lib.mkEnableOption "Enable OpenThread Border Router service";
+          address = lib.mkOption {
+            type = lib.types.str;
+            description = "OpenThread Border Router address";
+          };
+          device = lib.mkOption {
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+            description = "Thread radio USB device path";
+          };
+        };
         home-assistant = {
           enable = lib.mkEnableOption "Enable HomeAssistant service";
           address = lib.mkOption {
             type = lib.types.str;
             description = "Unifi controller address";
-          };
-          threadDevice = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            default = null;
-            description = "Thread USB device path";
           };
           zigbeeDevice = lib.mkOption {
             type = lib.types.nullOr lib.types.str;

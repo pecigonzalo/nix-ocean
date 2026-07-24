@@ -20,10 +20,6 @@
     # Mount Zigbee USB device
     bindMounts = {
       "/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
-      "/dev/thread" = {
-        hostPath = config.router.services.home-assistant.threadDevice;
-        isReadOnly = false;
-      };
       "/dev/zigbee" = {
         hostPath = config.router.services.home-assistant.zigbeeDevice;
         isReadOnly = false;
@@ -34,10 +30,6 @@
       };
     };
     allowedDevices = [
-      {
-        node = "/dev/ttyACM0";
-        modifier = "rwm";
-      }
       {
         node = "/dev/ttyUSB0";
         modifier = "rwm";
@@ -102,11 +94,7 @@
             enable = true;
             userServices = true;
           };
-          reflector = true;
-          allowInterfaces = [
-            "mv-lan"
-            "wpan0"
-          ];
+          allowInterfaces = [ "mv-lan" ];
         };
 
         services.matter-server = {
@@ -115,27 +103,8 @@
         };
 
         systemd.services.matter-server = {
-          after = [
-            "network-online.target"
-            "otbr-agent.service"
-          ];
-          wants = [
-            "network-online.target"
-            "otbr-agent.service"
-          ];
-        };
-
-        services.openthread-border-router = {
-          enable = true;
-
-          openFirewall = true;
-          backboneInterfaces = [ "mv-lan" ];
-
-          radio = {
-            device = "/dev/thread";
-            baudRate = 460800;
-            flowControl = true;
-          };
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
         };
 
         users.users.hass.extraGroups = [ "dialout" ];

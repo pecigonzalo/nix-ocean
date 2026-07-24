@@ -73,6 +73,10 @@
             name = "ha.home";
           }
           {
+            target = config.router.services.thread.address;
+            name = "thread.home";
+          }
+          {
             target = "192.168.127.10";
             name = "beta.home";
           }
@@ -157,7 +161,11 @@
         enable = true;
         address = "192.168.127.40";
         zigbeeDevice = "/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_ee67a22ffb21f0118098608fb887153e-if00-port0";
-        threadDevice = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
+      };
+      thread = {
+        enable = true;
+        address = "192.168.127.41";
+        device = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
       backup = {
         enable = true;
