@@ -83,23 +83,17 @@
           authKeyFile = "/run/agenix/tailscale";
         };
 
-        services.avahi = {
-          enable = true;
-          openFirewall = true;
-          ipv4 = true;
-          ipv6 = true;
-          nssmdns4 = true;
-          nssmdns6 = true;
-          publish = {
-            enable = true;
-            userServices = true;
-          };
-          allowInterfaces = [ "mv-lan" ];
-        };
+        # Home Assistant and python-matter-server run their own mDNS stacks.
+        # Keep multicast DNS open without running an additional Avahi daemon.
+        networking.firewall.allowedUDPPorts = [ 5353 ];
 
         services.matter-server = {
           enable = true;
           openFirewall = true;
+          logLevel = "debug";
+          extraArgs = {
+            "primary-interface" = "mv-lan";
+          };
         };
 
         systemd.services.matter-server = {
@@ -170,6 +164,7 @@
                 "100.111.119.44/32"
               ];
             };
+
           };
         };
 
