@@ -171,10 +171,6 @@
         enable = true;
         address = "192.168.127.42";
       };
-      matter-mock = {
-        enable = true;
-        address = "192.168.127.43";
-      };
       backup = {
         enable = true;
         address = "192.168.127.60";

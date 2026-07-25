@@ -11,7 +11,6 @@
     ./home-assistant.nix
     ./thread.nix
     ./matter.nix
-    ./matter-mock.nix
     ./observability.nix
     ./speedtest.nix
     ./backup.nix
@@ -150,13 +149,6 @@
           address = lib.mkOption {
             type = lib.types.str;
             description = "Matter server address";
-          };
-        };
-        matter-mock = {
-          enable = lib.mkEnableOption "Enable Matter mock bridge (diagnostic)";
-          address = lib.mkOption {
-            type = lib.types.str;
-            description = "Matter mock bridge address";
           };
         };
         home-assistant = {
