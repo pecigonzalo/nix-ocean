@@ -92,11 +92,12 @@ in
               port = 5353;
 
               dhcp-authoritative = true;
+              # IPv4 DHCP only. IPv6 on the LAN is SLAAC via the host's Router
+              # Advertisements (see router/networking.nix); dnsmasq must not also
+              # emit RAs or a competing/broken prefix would reappear.
               dhcp-range = [
                 "${config.router.services.dhcp.start},${config.router.services.dhcp.end},12h"
-                "fd00:1000:1000:1::,ra-stateless,ra-names,12h"
               ];
-              enable-ra = true;
 
               dhcp-option = [
                 "option:router,${config.router.lan.address}"

@@ -61,11 +61,41 @@
     matchConfig.Name = "br-lan";
     linkConfig.RequiredForOnline = "routable";
 
-    address = [ "${config.router.lan.address}/${toString config.router.lan.prefixLength}" ];
+    address = [
+      "${config.router.lan.address}/${toString config.router.lan.prefixLength}"
+      # Host holds ::1 of the LAN ULA and is the IPv6 RA authority (below).
+      "fd00:1000:1000:1::1/64"
+    ];
 
     networkConfig = {
       DHCP = "no";
+      # The host is the LAN's single IPv6 RA source. It advertises the
+      # fd00::/64 ULA as on-link + SLAAC so every LAN/Wi-Fi client (including
+      # phones commissioning Matter/Thread) gets a routable source address.
+      # OTBR then detects this on-link prefix and stops advertising its own
+      # fdc9::/64, which it cannot route back from the Thread mesh. Clients
+      # still learn the Thread OMR route (fd7c::/64) from OTBR's own RA.
+      # Do not accept RAs here; the host is the source, not a consumer.
+      IPv6AcceptRA = false;
+      IPv6SendRA = true;
     };
+
+    # No IPv6 uplink, so the host is not a default router; only announce the
+    # on-link prefix, no default route and no RDNSS.
+    ipv6SendRAConfig = {
+      RouterLifetimeSec = 0;
+      EmitDNS = false;
+    };
+
+    ipv6Prefixes = [
+      {
+        ipv6PrefixConfig = {
+          Prefix = "fd00:1000:1000:1::/64";
+          OnLink = true;
+          AddressAutoconfiguration = true;
+        };
+      }
+    ];
   };
 
   # Enslave the physical LAN interface into the bridge
@@ -97,8 +127,10 @@
 
   # Router-specific kernel tuning
   boot.kernel.sysctl = {
-    # Enable IP forwarding for routing
+    # Enable IP forwarding for routing (IPv4 and IPv6; IPv6 forwarding is also
+    # required for the host to emit Router Advertisements on br-lan).
     "net.ipv4.ip_forward" = 1;
+    "net.ipv6.conf.all.forwarding" = 1;
     # Connection tracking
     "net.netfilter.nf_conntrack_max" = 524288;
     "net.netfilter.nf_conntrack_tcp_timeout_established" = 3600;
