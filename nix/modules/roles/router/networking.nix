@@ -82,10 +82,12 @@
     };
 
     # No IPv6 uplink, so the host is not a default router; only announce the
-    # on-link prefix, no default route and no RDNSS.
+    # on-link prefix (no default route). Hand out the LAN resolver over IPv6
+    # (RDNSS) so IPv6-only clients get DNS without relying on IPv4 DHCP.
     ipv6SendRAConfig = {
       RouterLifetimeSec = 0;
-      EmitDNS = false;
+      EmitDNS = true;
+      DNS = [ config.router.services.dns.address6 ];
     };
 
     ipv6Prefixes = [

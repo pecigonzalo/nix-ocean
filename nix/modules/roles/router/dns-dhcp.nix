@@ -1,6 +1,7 @@
 {
   agenix,
   config,
+  lib,
   ...
 }:
 let
@@ -45,7 +46,12 @@ in
           networks."10-lan" = {
             matchConfig.Name = "eth0";
             linkConfig.RequiredForOnline = "routable";
-            address = [ "${config.router.services.dns.address}/24" ];
+            address = [
+              "${config.router.services.dns.address}/24"
+            ]
+            ++ lib.optional (
+              config.router.services.dns.address6 != null
+            ) "${config.router.services.dns.address6}/${toString config.router.lan.prefixLength6}";
             gateway = [ config.router.lan.address ];
           };
         };
@@ -123,6 +129,12 @@ in
           mutableSettings = false;
           settings = {
             dns = {
+              # Serve DNS on IPv4 and IPv6 so clients that received this
+              # resolver via IPv6 Router Advertisements (RDNSS) can reach it.
+              bind_hosts = [
+                "0.0.0.0"
+                "::"
+              ];
               bootstrap_dns = config.router.services.dns.upstreams;
               upstream_dns = [
                 "[/${localDnsNetwork}/]127.0.0.1:5353"
