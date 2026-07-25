@@ -52,12 +52,11 @@
               "fd00:1000:1000:1::12/64"
             ];
             gateway = [ config.router.lan.address ];
-            # OTBR advertises its on-link prefix (fdc9::/64) via RA. Accept the
-            # RA routes (needed for the Thread OMR fd7c::/64 route) but do not
-            # autoconfigure an address from it: that extra SLAAC address becomes
-            # the preferred source toward the OMR and its replies do not route
-            # back, breaking PASE. Keep the static fd00::12 as the only global
-            # source.
+            # Accept RA routes (needed for the Thread OMR fd7c::/64 route from
+            # OTBR) but do not autoconfigure addresses from RAs: this container
+            # uses its static fd00::12 as the sole global source. This also
+            # guards against any transient extra on-link prefix becoming the
+            # preferred (and unroutable) source toward the OMR.
             ipv6AcceptRAConfig.UseAutonomousPrefix = false;
           };
         };
@@ -70,7 +69,7 @@
           openFirewall = true;
           extraArgs = [
             "--primary-interface=eth0"
-            "--log-level=debug"
+            "--log-level=info"
           ];
         };
       };
