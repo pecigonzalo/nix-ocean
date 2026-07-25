@@ -36,8 +36,11 @@
         };
 
         # matter.js runs its own mDNS on UDP 5353; keep resolved off so it owns
-        # the port cleanly.
+        # the port cleanly, and open 5353 so inbound multicast mDNS answers are
+        # not dropped by the container firewall (they are not conntrack-related
+        # to the outgoing query).
         services.resolved.enable = false;
+        networking.firewall.allowedUDPPorts = [ 5353 ];
 
         systemd.network = {
           enable = true;
