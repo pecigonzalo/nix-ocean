@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs-unstable,
   ...
 }:
@@ -49,8 +50,10 @@
             linkConfig.RequiredForOnline = "routable";
             address = [
               "${config.router.services.matter.address}/24"
-              "fd00:1000:1000:1::12/64"
-            ];
+            ]
+            ++ lib.optional (
+              config.router.services.matter.address6 != null
+            ) "${config.router.services.matter.address6}/${toString config.router.lan.prefixLength6}";
             gateway = [ config.router.lan.address ];
             # Accept RA routes (needed for the Thread OMR fd7c::/64 route from
             # OTBR) but do not autoconfigure addresses from RAs: this container

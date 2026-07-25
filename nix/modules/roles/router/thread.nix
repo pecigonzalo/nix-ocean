@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   containers.thread = {
     autoStart = true;
@@ -52,8 +52,10 @@
             linkConfig.RequiredForOnline = "routable";
             address = [
               "${config.router.services.thread.address}/24"
-              "fd00:1000:1000:1::11/64"
-            ];
+            ]
+            ++ lib.optional (
+              config.router.services.thread.address6 != null
+            ) "${config.router.services.thread.address6}/${toString config.router.lan.prefixLength6}";
             gateway = [ config.router.lan.address ];
           };
         };

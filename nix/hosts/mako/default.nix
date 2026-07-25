@@ -47,6 +47,7 @@
       dns = {
         enable = true;
         address = "192.168.127.5";
+        address6 = "fd00:1000:1000:1::5";
         dnsHosts = [
           {
             target = config.router.lan.address;
@@ -160,16 +161,19 @@
       home-assistant = {
         enable = true;
         address = "192.168.127.40";
+        address6 = "fd00:1000:1000:1::10";
         zigbeeDevice = "/dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_ee67a22ffb21f0118098608fb887153e-if00-port0";
       };
       thread = {
         enable = true;
         address = "192.168.127.41";
+        address6 = "fd00:1000:1000:1::11";
         device = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
       matter = {
         enable = true;
         address = "192.168.127.42";
+        address6 = "fd00:1000:1000:1::12";
       };
       backup = {
         enable = true;

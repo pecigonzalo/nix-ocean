@@ -63,8 +63,9 @@
 
     address = [
       "${config.router.lan.address}/${toString config.router.lan.prefixLength}"
-      # Host holds ::1 of the LAN ULA and is the IPv6 RA authority (below).
-      "fd00:1000:1000:1::1/64"
+      # Host holds the router address of the LAN ULA and is the IPv6 RA
+      # authority (below).
+      "${config.router.lan.address6}/${toString config.router.lan.prefixLength6}"
     ];
 
     networkConfig = {
@@ -90,7 +91,7 @@
     ipv6Prefixes = [
       {
         ipv6PrefixConfig = {
-          Prefix = "fd00:1000:1000:1::/64";
+          Prefix = config.router.lan.ula;
           OnLink = true;
           AddressAutoconfiguration = true;
         };

@@ -1,6 +1,7 @@
 {
   agenix,
   config,
+  lib,
   pkgs-unstable,
   ...
 }:
@@ -70,8 +71,10 @@
             linkConfig.RequiredForOnline = "routable";
             address = [
               "${config.router.services."home-assistant".address}/24"
-              "fd00:1000:1000:1::10/64"
-            ];
+            ]
+            ++
+              lib.optional (config.router.services."home-assistant".address6 != null)
+                "${config.router.services."home-assistant".address6}/${toString config.router.lan.prefixLength6}";
             gateway = [ config.router.lan.address ];
           };
         };
