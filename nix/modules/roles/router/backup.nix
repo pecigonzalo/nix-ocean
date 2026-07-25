@@ -159,7 +159,7 @@ in
     containers.syncthing = {
       autoStart = true;
 
-      macvlans = [ "lan" ];
+      hostBridge = "br-lan";
       privateNetwork = true;
       memoryLimit = "512M";
 
@@ -183,7 +183,7 @@ in
           systemd.network = {
             enable = true;
             networks."10-lan" = {
-              matchConfig.Name = "mv-lan";
+              matchConfig.Name = "eth0";
               linkConfig.RequiredForOnline = "routable";
               address = [ "${cfg.address}/24" ];
               gateway = [ config.router.lan.address ];

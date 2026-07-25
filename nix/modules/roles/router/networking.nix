@@ -41,37 +41,40 @@
     };
   };
 
-  # Create MACVLAN bridge for LAN interface and containers
-  systemd.network.netdevs."10-mv-lan-bridge" = {
+  # Create a real Linux bridge for the LAN interface and containers. Unlike a
+  # macvlan, a bridge forwards multicast between the physical LAN and every
+  # container veth, which mDNS-based discovery (Matter/Thread) depends on.
+  # Multicast snooping is disabled so mDNS floods to all bridge ports even
+  # without an IGMP/MLD querier on the segment.
+  systemd.network.netdevs."10-br-lan" = {
     netdevConfig = {
-      Name = "mv-lan-bridge";
-      Kind = "macvlan";
+      Name = "br-lan";
+      Kind = "bridge";
     };
-
-    macvlanConfig = {
-      Mode = "bridge";
+    bridgeConfig = {
+      MulticastSnooping = false;
+      STP = false;
     };
   };
 
-  systemd.network.networks."10-mv-lan-bridge" = {
-    matchConfig.Name = "mv-lan-bridge";
+  systemd.network.networks."10-br-lan" = {
+    matchConfig.Name = "br-lan";
     linkConfig.RequiredForOnline = "routable";
 
     address = [ "${config.router.lan.address}/${toString config.router.lan.prefixLength}" ];
 
     networkConfig = {
-      BindCarrier = "lan";
       DHCP = "no";
     };
   };
 
-  # Attach LAN interface to MACVLAN bridge
+  # Enslave the physical LAN interface into the bridge
   systemd.network.networks."10-lan" = {
     matchConfig.Name = "lan";
-    linkConfig.RequiredForOnline = "carrier";
+    linkConfig.RequiredForOnline = "enslaved";
+    bridge = [ "br-lan" ];
 
     networkConfig = {
-      MACVLAN = "mv-lan-bridge";
       DHCP = "no";
       IPv6AcceptRA = false;
       LinkLocalAddressing = "no";
@@ -190,7 +193,7 @@
   networking.nat = {
     enable = true;
     internalInterfaces = [
-      "mv-lan-bridge"
+      "br-lan"
       "tailscale0"
     ];
     externalInterface = "wan";
@@ -200,7 +203,7 @@
   networking.firewall = {
     enable = true;
     trustedInterfaces = [
-      "mv-lan-bridge"
+      "br-lan"
       "tailscale0"
     ];
     checkReversePath = "loose";

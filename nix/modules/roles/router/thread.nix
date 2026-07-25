@@ -3,7 +3,7 @@
   containers.thread = {
     autoStart = true;
 
-    macvlans = [ "lan" ];
+    hostBridge = "br-lan";
     privateNetwork = true;
     enableTun = true;
 
@@ -48,7 +48,7 @@
         systemd.network = {
           enable = true;
           networks."10-lan" = {
-            matchConfig.Name = "mv-lan";
+            matchConfig.Name = "eth0";
             linkConfig.RequiredForOnline = "routable";
             address = [
               "${config.router.services.thread.address}/24"
@@ -63,18 +63,18 @@
           openFirewall = true;
           ipv4 = true;
           ipv6 = true;
-          allowInterfaces = [ "mv-lan" ];
+          allowInterfaces = [ "eth0" ];
         };
 
         services.openthread-border-router = {
           enable = true;
 
           openFirewall = true;
-          backboneInterfaces = [ "mv-lan" ];
+          backboneInterfaces = [ "eth0" ];
 
           # otbr-agent's REST API defaults to 127.0.0.1, which is unreachable
-          # now that OTBR lives in its own container, separate from Home
-          # Assistant. Listen on all addresses so HA can reach it over the LAN.
+          # from the separate matter/home-assistant containers. Listen on all
+          # addresses so they can reach it over the LAN.
           rest.listenAddress = "::";
 
           radio = {

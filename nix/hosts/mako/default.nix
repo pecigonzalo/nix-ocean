@@ -167,6 +167,14 @@
         address = "192.168.127.41";
         device = "/dev/serial/by-id/usb-ITEAD_SONOFF_Zigbee_3.0_USB_Dongle_Plus_V2_20240217171220-if00";
       };
+      matter = {
+        enable = true;
+        address = "192.168.127.42";
+      };
+      matter-mock = {
+        enable = true;
+        address = "192.168.127.43";
+      };
       backup = {
         enable = true;
         address = "192.168.127.60";

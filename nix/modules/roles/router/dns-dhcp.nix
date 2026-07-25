@@ -10,7 +10,7 @@ in
   containers.dns-dhcp = {
     autoStart = true;
 
-    macvlans = [ "lan" ];
+    hostBridge = "br-lan";
     privateNetwork = true;
     enableTun = true;
 
@@ -43,7 +43,7 @@ in
         systemd.network = {
           enable = true;
           networks."10-lan" = {
-            matchConfig.Name = "mv-lan";
+            matchConfig.Name = "eth0";
             linkConfig.RequiredForOnline = "routable";
             address = [ "${config.router.services.dns.address}/24" ];
             gateway = [ config.router.lan.address ];

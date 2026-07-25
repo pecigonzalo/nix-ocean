@@ -7,7 +7,7 @@
   containers.unifi = {
     autoStart = true;
 
-    macvlans = [ "lan" ];
+    hostBridge = "br-lan";
     privateNetwork = true;
     memoryLimit = "1G";
     specialArgs = {
@@ -32,7 +32,7 @@
         systemd.network = {
           enable = true;
           networks."10-lan" = {
-            matchConfig.Name = "mv-lan";
+            matchConfig.Name = "eth0";
             linkConfig.RequiredForOnline = "routable";
             address = [ "${config.router.services.unifi.address}/24" ];
             gateway = [ config.router.lan.address ];

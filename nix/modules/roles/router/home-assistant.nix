@@ -8,7 +8,7 @@
   containers.home-assistant = {
     autoStart = true;
 
-    macvlans = [ "lan" ];
+    hostBridge = "br-lan";
     privateNetwork = true;
     enableTun = true;
     specialArgs = {
@@ -66,7 +66,7 @@
         systemd.network = {
           enable = true;
           networks."10-lan" = {
-            matchConfig.Name = "mv-lan";
+            matchConfig.Name = "eth0";
             linkConfig.RequiredForOnline = "routable";
             address = [
               "${config.router.services."home-assistant".address}/24"
@@ -83,23 +83,9 @@
           authKeyFile = "/run/agenix/tailscale";
         };
 
-        # Home Assistant and python-matter-server run their own mDNS stacks.
-        # Keep multicast DNS open without running an additional Avahi daemon.
+        # Home Assistant runs its own zeroconf mDNS stack for discovery.
+        # matter-server now lives in its own container (see matter.nix).
         networking.firewall.allowedUDPPorts = [ 5353 ];
-
-        services.matter-server = {
-          enable = true;
-          openFirewall = true;
-          logLevel = "debug";
-          extraArgs = {
-            "primary-interface" = "mv-lan";
-          };
-        };
-
-        systemd.services.matter-server = {
-          after = [ "network-online.target" ];
-          wants = [ "network-online.target" ];
-        };
 
         users.users.hass.extraGroups = [ "dialout" ];
         services.home-assistant = {
