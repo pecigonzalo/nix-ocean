@@ -1,4 +1,8 @@
-{ config, ... }:
+{
+  config,
+  pkgs-unstable,
+  ...
+}:
 {
   containers.matter = {
     autoStart = true;
@@ -6,12 +10,22 @@
     hostBridge = "br-lan";
     privateNetwork = true;
 
-    memoryLimit = "512M";
+    # matter.js server (Node) needs roughly twice the RAM of the old Python one.
+    memoryLimit = "1G";
+
+    specialArgs = {
+      inherit pkgs-unstable;
+    };
 
     config =
-      { ... }:
+      { pkgs-unstable, ... }:
       {
-        imports = [ ../../common/server-tools.nix ];
+        imports = [
+          ../../common/server-tools.nix
+          # services.matterjs-server only exists in nixpkgs-unstable; pull the
+          # module from there and override the package with the unstable build.
+          "${pkgs-unstable.path}/nixos/modules/services/home-automation/matterjs-server.nix"
+        ];
         system.stateVersion = "25.05";
 
         networking = {
@@ -21,10 +35,8 @@
           nameservers = [ config.router.services.dns.address ];
         };
 
-        # matter-server ships its own (CHIP minimal) mDNS stack, which must own
-        # UDP 5353 for commissioning discovery. Disable resolved so it does not
-        # also bind the mDNS port and starve CHIP's discovery. OTBR's avahi runs
-        # in a separate container and reaches this one over the br-lan bridge.
+        # matter.js runs its own mDNS on UDP 5353; keep resolved off so it owns
+        # the port cleanly.
         services.resolved.enable = false;
 
         systemd.network = {
@@ -40,14 +52,16 @@
           };
         };
 
-        services.matter-server = {
+        services.matterjs-server = {
           enable = config.router.services.matter.enable;
+          package = pkgs-unstable.matterjs-server;
+          listenAddress = "0.0.0.0";
+          port = 5580;
           openFirewall = true;
-          logLevel = "debug";
-          extraArgs = {
-            "primary-interface" = "eth0";
-            "log-level-sdk" = "detail";
-          };
+          extraArgs = [
+            "--primary-interface=eth0"
+            "--log-level=debug"
+          ];
         };
       };
   };
