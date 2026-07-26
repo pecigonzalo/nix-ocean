@@ -128,6 +128,12 @@
     };
   };
 
+  # Pin the CPU to full clocks. As a router running CAKE/SQM, the small idle
+  # power cost is worth avoiding intel_pstate frequency-ramp latency and jitter
+  # on the forwarding path. Only "performance" and "powersave" are available
+  # under intel_pstate active mode.
+  powerManagement.cpuFreqGovernor = "performance";
+
   # Router-specific kernel tuning
   boot.kernel.sysctl = {
     # Enable IP forwarding for routing (IPv4 and IPv6; IPv6 forwarding is also
