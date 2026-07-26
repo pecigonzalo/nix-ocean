@@ -118,23 +118,22 @@ in
         ];
         relabel_configs = blackboxRelabelConfigs;
       }
-      {
-        job_name = "blackbox_http";
-        metrics_path = "/probe";
-        scrape_interval = "1s";
-        params = {
-          module = [ "http_2xx" ];
-        };
-        static_configs = [
-          {
-            targets = [
-              "ssh.munin.xyz"
-            ];
-          }
-        ];
-        relabel_configs = blackboxRelabelConfigs;
-
-      }
+      #      {
+      #        job_name = "blackbox_http";
+      #        metrics_path = "/probe";
+      #        scrape_interval = "1s";
+      #        params = {
+      #          module = [ "http_2xx" ];
+      #        };
+      #        static_configs = [
+      #          {
+      #            targets = [
+      #              "ssh.munin.xyz"
+      #            ];
+      #          }
+      #        ];
+      #        relabel_configs = blackboxRelabelConfigs;
+      #      }
       {
         job_name = "blackbox_exporter";
         static_configs = [
