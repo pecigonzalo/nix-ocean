@@ -88,7 +88,19 @@
 
         # Home Assistant runs its own zeroconf mDNS stack for discovery.
         # matter-server now lives in its own container (see matter.nix).
-        networking.firewall.allowedUDPPorts = [ 5353 ];
+        networking.firewall.allowedTCPPorts = [
+          # Ports used by HomeKit Bridge
+          21063
+          21064
+          21065
+          21066
+          21067
+          21068
+        ];
+        networking.firewall.allowedUDPPorts = [
+          1900
+          5353
+        ];
 
         users.users.hass.extraGroups = [ "dialout" ];
         services.home-assistant = {
@@ -124,6 +136,7 @@
             "cast"
             "apple_tv"
             "androidtv_remote"
+            "homekit"
           ];
           customComponents = with pkgs-unstable.home-assistant-custom-components; [
             alarmo
