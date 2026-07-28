@@ -63,6 +63,18 @@
           description = "LAN IPv6 prefix length";
         };
       };
+      sqm = {
+        downloadSpeed = lib.mkOption {
+          type = lib.types.str;
+          default = "900mbit";
+          description = "CAKE download shaping rate";
+        };
+        uploadSpeed = lib.mkOption {
+          type = lib.types.str;
+          default = "900mbit";
+          description = "CAKE upload shaping rate";
+        };
+      };
       tailscale = {
         routes = lib.mkOption {
           type = lib.types.listOf lib.types.str;

@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -86,8 +87,10 @@
     # (RDNSS) so IPv6-only clients get DNS without relying on IPv4 DHCP.
     ipv6SendRAConfig = {
       RouterLifetimeSec = 0;
-      EmitDNS = true;
-      DNS = [ config.router.services.dns.address6 ];
+      EmitDNS = config.router.services.dns.address6 != null;
+      DNS = lib.optional (
+        config.router.services.dns.address6 != null
+      ) config.router.services.dns.address6;
     };
 
     ipv6Prefixes = [
@@ -120,6 +123,7 @@
     enable = true;
     ipv4 = true;
     ipv6 = true;
+    allowInterfaces = [ "br-lan" ];
     nssmdns4 = true;
     nssmdns6 = true;
     publish = {
@@ -156,17 +160,26 @@
   # Enable RPS (Software RSS) to fix single-queue bottleneck
   systemd.services.rps-tuning = {
     description = "Enable RPS for NICs";
-    after = [ "network.target" ];
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = pkgs.writeScript "enable-rps" ''
         #!${pkgs.bash}/bin/bash
-        # Apply 'f' (all 4 cores) to any interface with a receive queue
-        for interface in /sys/class/net/*; do
-          if [ -e "$interface/queues/rx-0/rps_cpus" ]; then
-            echo f > "$interface/queues/rx-0/rps_cpus"
+        set -euo pipefail
+
+        readonly cpu_count="$(${pkgs.coreutils}/bin/nproc)"
+        if ((cpu_count > 32)); then
+          readonly rps_mask="ffffffff"
+        else
+          readonly rps_mask="$(${pkgs.coreutils}/bin/printf '%x' "$(( (1 << cpu_count) - 1 ))")"
+        fi
+
+        for rps_cpus in /sys/class/net/*/queues/rx-*/rps_cpus; do
+          if [[ -e "''${rps_cpus}" ]]; then
+            echo "''${rps_mask}" > "''${rps_cpus}"
           fi
         done
       '';
@@ -176,50 +189,45 @@
   # Tune SQM for connection
   systemd.services.sqm-tuning = {
     description = "Enable CAKE SQM with bandwidth limits";
-    after = [ "network.target" ];
+    after = [
+      "network-online.target"
+      "sys-subsystem-net-devices-wan.device"
+    ];
+    wants = [ "network-online.target" ];
+    requires = [ "sys-subsystem-net-devices-wan.device" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = pkgs.writeScript "enable-sqm" ''
         #!${pkgs.bash}/bin/bash
+        set -euo pipefail
 
-        WAN_IFACE="wan"
-        LAN_IFACE="lan"
-
-        # Set to 90-95% of your real speed to ensure the queue stays in router
-        # Example: 1Gbps link -> 900mbit or 920mbit
-        DL_SPEED="900mbit"
-        UL_SPEED="900mbit"
+        readonly wan_iface="wan"
+        readonly lan_iface="lan"
+        readonly dl_speed="${config.router.sqm.downloadSpeed}"
+        readonly ul_speed="${config.router.sqm.uploadSpeed}"
 
         ${pkgs.kmod}/bin/modprobe ifb
-        # Create ifb0 manually if it doesn't exist
         if ! ${pkgs.iproute2}/bin/ip link show ifb0 > /dev/null 2>&1; then
-            ${pkgs.iproute2}/bin/ip link add name ifb0 type ifb
+          ${pkgs.iproute2}/bin/ip link add name ifb0 type ifb
         fi
         ${pkgs.iproute2}/bin/ip link set dev ifb0 up
 
-        # Force disable LRO/GRO on the physical WAN to ensure accurate shaping
-        ${pkgs.ethtool}/bin/ethtool -K $WAN_IFACE gro off gso off tso off lro off 2>/dev/null || true
-        ${pkgs.ethtool}/bin/ethtool -K $LAN_IFACE gro off gso off tso off lro off 2>/dev/null || true
+        # Accurate shaping requires segmentation and receive offloads disabled.
+        ${pkgs.ethtool}/bin/ethtool -K "''${wan_iface}" gro off gso off tso off lro off 2>/dev/null || true
+        ${pkgs.ethtool}/bin/ethtool -K "''${lan_iface}" gro off gso off tso off lro off 2>/dev/null || true
 
-        # Bring ifb0 up
-        ${pkgs.iproute2}/bin/ip link set dev ifb0 up
-
-        # Cleanup
-        ${pkgs.iproute2}/bin/tc qdisc del dev $WAN_IFACE root 2>/dev/null || true
-        ${pkgs.iproute2}/bin/tc qdisc del dev $WAN_IFACE ingress 2>/dev/null || true
+        # Cleanup allows the oneshot service to be restarted safely.
+        ${pkgs.iproute2}/bin/tc qdisc del dev "''${wan_iface}" root 2>/dev/null || true
+        ${pkgs.iproute2}/bin/tc qdisc del dev "''${wan_iface}" ingress 2>/dev/null || true
         ${pkgs.iproute2}/bin/tc qdisc del dev ifb0 root 2>/dev/null || true
 
-        # Upload
-        ${pkgs.iproute2}/bin/tc qdisc add dev $WAN_IFACE root cake bandwidth $UL_SPEED nat
-
-        # Download
-        ${pkgs.iproute2}/bin/tc qdisc add dev $WAN_IFACE handle ffff: ingress
-        ${pkgs.iproute2}/bin/tc qdisc add dev ifb0 root cake bandwidth $DL_SPEED nat wash ingress
-
-        # Redirect Ingress -> IFB0
-        ${pkgs.iproute2}/bin/tc filter add dev $WAN_IFACE parent ffff: matchall action mirred egress redirect dev ifb0
+        # Apply CAKE SQM with bandwidth limits on the WAN interface and redirect ingress to ifb0
+        ${pkgs.iproute2}/bin/tc qdisc add dev "''${wan_iface}" root cake bandwidth "''${ul_speed}" nat
+        ${pkgs.iproute2}/bin/tc qdisc add dev "''${wan_iface}" handle ffff: ingress
+        ${pkgs.iproute2}/bin/tc qdisc add dev ifb0 root cake bandwidth "''${dl_speed}" nat wash ingress
+        ${pkgs.iproute2}/bin/tc filter add dev "''${wan_iface}" parent ffff: matchall action mirred egress redirect dev ifb0
       '';
     };
   };
