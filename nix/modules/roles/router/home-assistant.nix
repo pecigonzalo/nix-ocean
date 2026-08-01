@@ -16,7 +16,7 @@
       inherit pkgs-unstable;
     };
 
-    memoryLimit = "1G";
+    memoryLimit = "2G";
 
     # Mount Zigbee USB device
     bindMounts = {
@@ -137,12 +137,23 @@
             "apple_tv"
             "androidtv_remote"
             "homekit"
+            "homekit_controller"
           ];
           customComponents = with pkgs-unstable.home-assistant-custom-components; [
             alarmo
           ];
           config = {
             default_config = { };
+
+            # Use the CC2652P power amplifier at the highest level supported
+            # by zigpy-znp for this coordinator.
+            zha = {
+              zigpy_config = {
+                znp_config = {
+                  tx_power = 19;
+                };
+              };
+            };
 
             frontend = {
               themes = "!include_dir_merge_named themes";
