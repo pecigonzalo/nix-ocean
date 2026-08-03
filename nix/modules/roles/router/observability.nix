@@ -82,6 +82,16 @@ in
       };
     };
   };
+  services.prometheus.exporters.unpoller = {
+    enable = true;
+    controllers = [
+      {
+        url = "https://192.168.127.250:8443";
+        verify_ssl = false;
+        user = "exporter";
+      }
+    ];
+  };
   services.prometheus = {
     enable = true;
     retentionTime = "30d";
@@ -138,6 +148,12 @@ in
         job_name = "blackbox_exporter";
         static_configs = [
           { targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.blackbox.port}" ]; }
+        ];
+      }
+      {
+        job_name = "unpoller";
+        static_configs = [
+          { targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.unpoller.port}" ]; }
         ];
       }
     ];
