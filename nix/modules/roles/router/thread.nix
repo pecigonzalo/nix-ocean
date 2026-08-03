@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   containers.thread = {
     autoStart = true;
@@ -60,6 +65,11 @@
           };
         };
 
+        # Avahi must be the sole mDNS listener in this container. OTBR uses
+        # it for the MeshCoP border-router advertisement; systemd-resolved's
+        # competing 5353 socket makes that advertisement unreliable.
+        services.resolved.enable = false;
+
         services.avahi = {
           enable = true;
           openFirewall = true;
@@ -85,6 +95,24 @@
             flowControl = true;
           };
         };
+
+        # The EFR32 RCP boots at 0 dBm. Reapply the adapter's supported
+        # maximum whenever OTBR starts; this changes only RF output power and
+        # does not alter the Thread dataset or network identity.
+        systemd.services.otbr-agent.serviceConfig.ExecStartPost = pkgs.writeScript "set-thread-tx-power" ''
+          #!${pkgs.bash}/bin/bash
+          set -euo pipefail
+
+          for attempt in {1..30}; do
+            if ${pkgs.openthread-border-router}/bin/ot-ctl txpower 14; then
+              exit 0
+            fi
+            ${pkgs.coreutils}/bin/sleep 1
+          done
+
+          echo "Unable to set Thread radio TX power" >&2
+          exit 0
+        '';
       };
   };
 }
