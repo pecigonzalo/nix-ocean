@@ -186,6 +186,16 @@
     observability.speedtest = {
       enable = true;
       interval = "6h";
+      targets = [
+        {
+          name = "scaleway_fr";
+          host = "ping.online.net";
+          # The first public server instances are unreliable; use healthy
+          # instances while retaining the same Scaleway endpoint.
+          uploadPort = 5202;
+          downloadPort = 5203;
+        }
+      ];
     };
   };
 

@@ -7,6 +7,14 @@
 let
   cfg = config.router.observability.speedtest;
 
+  # Prometheus may scrape the upload and download jobs at the same time. Public
+  # iperf3 servers generally allow only one test at a time, so serialize the
+  # child processes while keeping the exporter itself concurrent.
+  iperf3Command = pkgs.writeShellScriptBin "iperf3" ''
+    exec ${pkgs.util-linux}/bin/flock --exclusive /run/iperf3-exporter/iperf3.lock \
+      ${pkgs.iperf3}/bin/iperf3 "$@"
+  '';
+
   iperf3ExporterPackage =
     let
       version = "1.3.1";
@@ -38,7 +46,7 @@ let
         runHook preInstall
         install -Dm755 iperf3_exporter "$out/bin/iperf3_exporter"
         wrapProgram "$out/bin/iperf3_exporter" \
-          --prefix PATH : ${lib.makeBinPath [ pkgs.iperf3 ]}
+          --prefix PATH : ${lib.makeBinPath [ iperf3Command ]}
         runHook postInstall
       '';
 
@@ -204,6 +212,7 @@ in
         Restart = "always";
         RestartSec = "10s";
         DynamicUser = true;
+        RuntimeDirectory = "iperf3-exporter";
         PrivateTmp = true;
         ProtectSystem = "strict";
         ProtectHome = true;
