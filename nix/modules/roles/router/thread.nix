@@ -104,7 +104,7 @@
           set -euo pipefail
 
           for attempt in {1..30}; do
-            if ${pkgs.openthread-border-router}/bin/ot-ctl txpower 14; then
+            if ${pkgs.openthread-border-router}/bin/ot-ctl txpower 20; then
               exit 0
             fi
             ${pkgs.coreutils}/bin/sleep 1
