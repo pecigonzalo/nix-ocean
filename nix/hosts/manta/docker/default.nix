@@ -72,6 +72,7 @@ in
     ./sonarr.nix
     ./recyclarr.nix
     ./torrent.nix
+    ./trek.nix
     ./wordpress.nix
     # ./ghost.nix
   ];
