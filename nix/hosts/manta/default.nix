@@ -37,9 +37,6 @@
   age.secrets.authelia-users.file = "${secrets}/authelia-users.age";
   age.secrets.authelia-jwt-secret.file = "${secrets}/authelia-jwt-secret.age";
   age.secrets.authelia-storage-key.file = "${secrets}/authelia-storage-key.age";
-  age.secrets.authelia-oidc-hmac-secret.file = "${secrets}/authelia-oidc-hmac-secret.age";
-  age.secrets.authelia-oidc-issuer-key.file = "${secrets}/authelia-oidc-issuer-key.age";
-  age.secrets.authelia-oidc-client-secret.file = "${secrets}/authelia-oidc-client-secret.age";
   age.secrets.wordpress-db-password.file = "${secrets}/wordpress-db-password.age";
   age.secrets.grafana-prometheus-token.file = "${secrets}/grafana-prometheus-token.age";
   age.secrets.grafana-prometheus-token.owner = "prometheus";

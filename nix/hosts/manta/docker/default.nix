@@ -65,7 +65,6 @@ in
   imports = [
     ./authelia.nix
     ./traefik.nix
-    ./portainer.nix
     ./plex.nix
     ./bazarr.nix
     ./radarr.nix
