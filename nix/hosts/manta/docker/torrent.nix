@@ -39,7 +39,7 @@ in
       port = 7476;
       host = "qui";
       container = {
-        image = "ghcr.io/autobrr/qui:v1.18";
+        image = "ghcr.io/autobrr/qui:v1.28";
         environment = {
           QUI__AUTH_DISABLED = "true";
           QUI__I_ACKNOWLEDGE_THIS_IS_A_BAD_IDEA = "true";
