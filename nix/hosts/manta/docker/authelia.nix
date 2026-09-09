@@ -44,6 +44,11 @@ let
           ];
           policy = "bypass";
         }
+        {
+          domain = [ "wealthfolio.julesinabox.com" ];
+          resources = [ "/manifest.json" ];
+          policy = "bypass";
+        }
       ];
     };
     session = {
