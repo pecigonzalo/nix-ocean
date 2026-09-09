@@ -5,7 +5,7 @@
       name = "radarr";
       port = 7878;
       container = {
-        image = "ghcr.io/linuxserver/radarr:5.17.2";
+        image = "ghcr.io/linuxserver/radarr:6.3.0";
         environment = {
           PUID = toString config.users.users.media.uid;
           PGID = toString config.users.groups.media.gid;

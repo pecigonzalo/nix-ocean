@@ -5,7 +5,7 @@
       name = "sonarr";
       port = 8989;
       container = {
-        image = "ghcr.io/linuxserver/sonarr:4.0.9";
+        image = "ghcr.io/linuxserver/sonarr:4.0.19";
         environment = {
           PUID = toString config.users.users.media.uid;
           PGID = toString config.users.groups.media.gid;
