@@ -74,5 +74,6 @@ in
     ./trek.nix
     ./wordpress.nix
     # ./ghost.nix
+    ./wealthfolio.nix
   ];
 }

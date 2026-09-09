@@ -32,17 +32,18 @@
     fsType = "ext4";
   };
 
-  age.secrets.tailscale.file = "${secrets}/tailscale.age";
-  age.secrets.tailscale-proxy.file = "${secrets}/tailscale-proxy.age";
-  age.secrets.authelia-users.file = "${secrets}/authelia-users.age";
   age.secrets.authelia-jwt-secret.file = "${secrets}/authelia-jwt-secret.age";
   age.secrets.authelia-storage-key.file = "${secrets}/authelia-storage-key.age";
-  age.secrets.wordpress-db-password.file = "${secrets}/wordpress-db-password.age";
+  age.secrets.authelia-users.file = "${secrets}/authelia-users.age";
+  age.secrets.ghost-db-password.file = "${secrets}/ghost-db-password.age";
+  age.secrets.grafana-logs-token.file = "${secrets}/grafana-logs-token.age";
   age.secrets.grafana-prometheus-token.file = "${secrets}/grafana-prometheus-token.age";
   age.secrets.grafana-prometheus-token.owner = "prometheus";
-  age.secrets.grafana-logs-token.file = "${secrets}/grafana-logs-token.age";
   age.secrets.plex-claim.file = "${secrets}/plex-claim.age";
-  age.secrets.ghost-db-password.file = "${secrets}/ghost-db-password.age";
+  age.secrets.tailscale-proxy.file = "${secrets}/tailscale-proxy.age";
+  age.secrets.tailscale.file = "${secrets}/tailscale.age";
+  age.secrets.wealthfolio.file = "${secrets}/wealthfolio.age";
+  age.secrets.wordpress-db-password.file = "${secrets}/wordpress-db-password.age";
 
   boot = {
     swraid.enable = true;
