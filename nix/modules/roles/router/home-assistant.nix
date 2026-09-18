@@ -148,10 +148,19 @@
             # Use the CC2652P power amplifier at the highest level supported
             # by zigpy-znp for this coordinator.
             zha = {
+              enable_quirks = true;
               zigpy_config = {
+                ota = {
+                  extra_providers = [
+                    { type = "ikea"; }
+                    { type = "sonoff"; }
+                    { type = "z2m"; }
+                  ];
+                };
                 znp_config = {
                   tx_power = 19;
                 };
+                max_concurrent_requests = 16;
               };
             };
 
@@ -171,13 +180,6 @@
               external_url = "https://ha.munin.xyz";
               internal_url = "http://ha.home:8123";
             };
-            http = {
-              use_x_forwarded_for = true;
-              trusted_proxies = [
-                "100.111.119.44/32"
-              ];
-            };
-
           };
         };
 
