@@ -125,14 +125,39 @@ in
               ];
               bootstrap_dns = config.router.services.dns.upstreams;
               upstream_dns = [
+                # Unqualified names (single-label DHCP lease hostnames)
+                "[//]127.0.0.1:5353"
                 "[/${localDnsNetwork}/]127.0.0.1:5353"
               ]
               ++ config.router.services.dns.upstreams;
               upstream_mode = "parallel";
 
-              private_networks = [ "192.168.127.0/24" ]; # TODO: Move to var
+              # Networks treated as private: PTR queries for them resolve via
+              # local_ptr_upstreams instead of the public upstreams, so no rDNS
+              # info leaks and Tailscale/LAN names come from the right places.
+              private_networks = [
+                "192.168.127.0/24" # LAN v4 -> dnsmasq
+                "100.64.0.0/10" # Tailscale CGNAT v4 -> MagicDNS
+                "fd00:1000:1000:1::/64" # LAN ULA v6 -> dnsmasq
+                "fd7a:115c:a1e0::/48" # Tailscale ULA v6 -> MagicDNS
+              ];
               use_private_ptr_resolvers = true;
-              local_ptr_upstreams = [ "127.0.0.1:5353" ];
+              # General fallback -> dnsmasq answers LAN leases/hosts even when
+              # Tailscale is down and keeps non-Tailscale PTR traffic away from
+              # MagicDNS. dnsproxy requires at least one general (non-scoped)
+              # entry and that reserved reverse zones are inside private_networks.
+              #
+              # Tailscale CGNAT 100.64.0.0/10 spans 64 /16 reverse zones
+              # (64.100..127.100.in-addr.arpa), each needs its own rule, hence
+              # the generated list below; tailnet v6 is a single zone.
+              local_ptr_upstreams =
+                map (o: "[/${toString o}.100.in-addr.arpa/]100.100.100.100:53") (
+                  lib.range 64 127
+                )
+                ++ [
+                  "[/0.e.1.a.c.5.1.1.a.7.d.f.ip6.arpa/]100.100.100.100:53"
+                  "127.0.0.1:5353"
+                ];
 
               cache_enabled = true;
               cache_size = 256 * 1024; # 256 MB
