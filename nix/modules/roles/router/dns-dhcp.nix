@@ -151,9 +151,7 @@ in
               # (64.100..127.100.in-addr.arpa), each needs its own rule, hence
               # the generated list below; tailnet v6 is a single zone.
               local_ptr_upstreams =
-                map (o: "[/${toString o}.100.in-addr.arpa/]100.100.100.100:53") (
-                  lib.range 64 127
-                )
+                map (o: "[/${toString o}.100.in-addr.arpa/]100.100.100.100:53") (lib.range 64 127)
                 ++ [
                   "[/0.e.1.a.c.5.1.1.a.7.d.f.ip6.arpa/]100.100.100.100:53"
                   "127.0.0.1:5353"
@@ -163,6 +161,7 @@ in
               cache_size = 256 * 1024; # 256 MB
 
               hostsfile_enabled = false;
+              ratelimit = 0;
             };
             clients = {
               runtime_sources = {
