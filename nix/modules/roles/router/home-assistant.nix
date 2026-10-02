@@ -153,14 +153,9 @@
                 ota = {
                   extra_providers = [
                     { type = "ikea"; }
-                    { type = "sonoff"; }
                     { type = "z2m"; }
                   ];
                 };
-                znp_config = {
-                  tx_power = 19;
-                };
-                max_concurrent_requests = 16;
               };
             };
 
