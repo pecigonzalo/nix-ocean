@@ -10,6 +10,13 @@ let
   wordpressDbPassword = config.age.secrets.wordpress-db-password.path;
   # Explicit PHP branch: `wordpress:latest` tracks the oldest supported PHP (8.3).
   wordpressImage = "wordpress:php8.5-apache";
+  # Apache binds :80 for an unprivileged user, so that is the only capability
+  # it needs; drop the rest and block setuid/setgid escalation.
+  hardeningOptions = [
+    "--security-opt=no-new-privileges:true"
+    "--cap-drop=ALL"
+    "--cap-add=NET_BIND_SERVICE"
+  ];
   exposeWordpress = false;
 in
 {
@@ -45,6 +52,7 @@ in
         ];
         extraOptions =
           lib.optional exposeWordpress "--label=traefik.http.routers.julesinabox.rule=Host(`${julesinaboxDomain}`) || Host(`www.${julesinaboxDomain}`)"
+          ++ hardeningOptions
           ++ [ "--memory=256M" ];
       };
     };
@@ -60,6 +68,7 @@ in
         ];
         extraOptions =
           lib.optional exposeWordpress "--label=traefik.http.routers.portfolio.rule=Host(`portfolio.${julesinaboxDomain}`) || Host(`www.portfolio.${julesinaboxDomain}`)"
+          ++ hardeningOptions
           ++ [ "--memory=256M" ];
       };
     };
@@ -75,7 +84,7 @@ in
     #     ];
     #     extraOptions = [
     #       "--label=traefik.http.routers.thekiwidiaries.rule=Host(`${thekiwidiariesDomain}`) || Host(`www.${thekiwidiariesDomain}`)"
-    #     ];
+    #     ] ++ hardeningOptions;
     #   };
     # };
   };
