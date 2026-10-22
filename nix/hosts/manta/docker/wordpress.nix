@@ -8,6 +8,8 @@ let
   julesinaboxDomain = "julesinabox.com";
   thekiwidiariesDomain = "thekiwidiaries.com";
   wordpressDbPassword = config.age.secrets.wordpress-db-password.path;
+  # Explicit PHP branch: `wordpress:latest` tracks the oldest supported PHP (8.3).
+  wordpressImage = "wordpress:php8.5-apache";
   exposeWordpress = false;
 in
 {
@@ -36,7 +38,7 @@ in
       proxy = exposeWordpress;
       auth = false;
       container = {
-        image = "wordpress:latest";
+        image = wordpressImage;
         user = "${toString config.users.users.wordpress.uid}:${toString config.users.groups.wordpress.gid}";
         volumes = [
           "/data/containers/wordpress/www/julesinabox:/var/www/html"
@@ -51,7 +53,7 @@ in
       proxy = exposeWordpress;
       auth = false;
       container = {
-        image = "wordpress:latest";
+        image = wordpressImage;
         user = "${toString config.users.users.wordpress.uid}:${toString config.users.groups.wordpress.gid}";
         volumes = [
           "/data/containers/wordpress/www/portfolio:/var/www/html"
@@ -66,7 +68,7 @@ in
     #   name = "tkd";
     #   auth = false;
     #   container = {
-    #     image = "wordpress:latest";
+    #     image = wordpressImage;
     #     user = "${toString config.users.users.wordpress.uid}:${toString config.users.groups.wordpress.gid}";
     #     volumes = [
     #       "/data/containers/wordpress/www/thekiwidiaries:/var/www/html"
