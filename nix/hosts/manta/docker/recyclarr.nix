@@ -5,7 +5,9 @@
       name = "recyclarr";
       proxy = false;
       container = {
-        image = "ghcr.io/recyclarr/recyclarr:latest";
+        # Pinned: upstream stopped publishing the `latest` tag, so `--pull=always`
+        # fails with "manifest unknown" and the container cannot start.
+        image = "ghcr.io/recyclarr/recyclarr:8.3.2";
         volumes = [
           "/data/containers/recyclarr/config:/config"
         ];
