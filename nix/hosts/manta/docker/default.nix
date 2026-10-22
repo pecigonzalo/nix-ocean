@@ -21,7 +21,6 @@ let
       proxyOptions =
         if proxy then
           [
-            "--pull=always"
             "--network=proxy"
             "--label=traefik.enable=true"
           ]
@@ -33,7 +32,10 @@ let
         else
           [ ];
       newContainer = container // {
-        extraOptions = existingOptions ++ proxyOptions;
+        # Pull on every start, independent of whether the container is proxied.
+        # Without this a restart reuses the local image forever, which is how
+        # WordPress ended up on a vulnerable PHP release (CVE-2026-109618).
+        extraOptions = existingOptions ++ [ "--pull=always" ] ++ proxyOptions;
         log-driver = "local";
       };
     in
