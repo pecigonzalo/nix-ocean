@@ -7,6 +7,11 @@
   ];
 
   config = {
+    # Servers stay on UTC, but declare it: with the default (`null`) no
+    # /etc/localtime is generated and systemd reports "Time zone: n/a", which
+    # is how a stray Docker-created /etc/localtime directory went unnoticed.
+    time.timeZone = "UTC";
+
     # Modern OpenSSH configuration
     services.openssh = {
       enable = true;
