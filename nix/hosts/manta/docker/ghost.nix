@@ -39,7 +39,6 @@ in
         "--pull=always"
         "--network=proxy"
       ];
-      log-driver = "local";
     };
   };
 }

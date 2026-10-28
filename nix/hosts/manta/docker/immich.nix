@@ -41,7 +41,6 @@ in
       pull = "always";
       networks = [ "immich" ];
       extraOptions = hardening ++ [ "--memory=512M" ];
-      log-driver = "local";
     };
 
     immich-db = {
@@ -63,7 +62,6 @@ in
         "--memory=2G"
       ];
       networks = [ "immich" ];
-      log-driver = "local";
     };
 
     immich-machine-learning = {
@@ -78,7 +76,6 @@ in
       volumes = [ "/data/containers/immich-cache:/cache" ];
       extraOptions = hardening ++ [ "--memory=6G" ];
       networks = [ "immich" ];
-      log-driver = "local";
     };
 
     immich-server = {
@@ -101,7 +98,6 @@ in
       volumes = [ "${dataDir}/library:/data" ];
       extraOptions = hardening ++ [ "--memory=4G" ];
       networks = [ "immich" ];
-      log-driver = "local";
     };
   };
 

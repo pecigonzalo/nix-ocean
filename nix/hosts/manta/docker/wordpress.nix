@@ -34,7 +34,6 @@ in
         "--pull=always"
         "--memory=512M"
       ];
-      log-driver = "local";
     };
 
     # Both sites are unpublished for now. To publish one, give it a route, for

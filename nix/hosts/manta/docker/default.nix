@@ -5,6 +5,9 @@
   ...
 }:
 let
+  # Logs use the NixOS default driver, journald, so every container's output lands
+  # in the journal (bounded and rate limited by systemd) and reaches Grafana Cloud
+  # through Alloy's loki.source.journal. `docker logs` still reads it back.
   # Wrap container definitions so every service gets the same defaults and,
   # when `route` is set, the same Traefik wiring.
   #
@@ -54,7 +57,6 @@ let
       # forever, which is how WordPress ended up on a vulnerable PHP release
       # (CVE-2026-109618).
       pull = container.pull or "always";
-      log-driver = container.log-driver or "local";
     }
     // lib.optionalAttrs (route != null) {
       networks = lib.unique ((container.networks or [ ]) ++ [ (route.network or "proxy") ]);

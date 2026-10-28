@@ -78,7 +78,6 @@ in
         "/data/containers/traefik/config:/config"
         "${staticRoutes}:/config/routes.static.yaml"
       ];
-      log-driver = "local";
     };
   };
 }
