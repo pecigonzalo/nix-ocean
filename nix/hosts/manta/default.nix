@@ -39,6 +39,7 @@
   age.secrets.grafana-logs-token.file = "${secrets}/grafana-logs-token.age";
   age.secrets.grafana-prometheus-token.file = "${secrets}/grafana-prometheus-token.age";
   age.secrets.grafana-prometheus-token.owner = "prometheus";
+  age.secrets.immich-db-password.file = "${secrets}/immich-db-password.age";
   age.secrets.plex-claim.file = "${secrets}/plex-claim.age";
   age.secrets.tailscale-proxy.file = "${secrets}/tailscale-proxy.age";
   age.secrets.tailscale.file = "${secrets}/tailscale.age";

@@ -43,24 +43,35 @@ let
 in
 {
   virtualisation.oci-containers.backend = "docker";
-  system.userActivationScripts.mkDockerNetworks =
-    let
-      docker = "${pkgs.docker}/bin/docker";
-    in
-    ''
-      attempts=0
-      until ${docker} info >/dev/null 2>&1 || [ $attempts -ge 30 ]; do
-        attempts=$((attempts + 1))
-        sleep 1
-      done
 
-      if ${docker} info >/dev/null 2>&1; then
-        ${docker} network inspect proxy >/dev/null 2>&1 || ${docker} network create proxy
-        ${docker} network inspect plex >/dev/null 2>&1 || ${docker} network create plex
-      else
-        echo "warning: docker daemon unavailable, skipped network creation" >&2
-      fi
-    '';
+  # Containers reference these networks by name, so they have to exist before
+  # the first `docker run`. This used to live in a user activation script,
+  # which raced with the container units on activation and on boot.
+  systemd.services = {
+    docker-networks = {
+      description = "Create the docker networks used by the oci containers";
+      wantedBy = [ "multi-user.target" ];
+      requires = [ "docker.service" ];
+      after = [ "docker.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      script = ''
+        for network in proxy plex immich; do
+          ${pkgs.docker}/bin/docker network inspect "$network" >/dev/null 2>&1 \
+            || ${pkgs.docker}/bin/docker network create "$network"
+        done
+      '';
+    };
+  }
+  // lib.mapAttrs' (name: _: {
+    name = "docker-${name}";
+    value = {
+      wants = [ "docker-networks.service" ];
+      after = [ "docker-networks.service" ];
+    };
+  }) config.virtualisation.oci-containers.containers;
   _module.args = {
     proxied = proxied;
   };
@@ -68,6 +79,7 @@ in
     ./authelia.nix
     ./traefik.nix
     ./plex.nix
+    ./immich.nix
     ./bazarr.nix
     ./radarr.nix
     ./sonarr.nix
