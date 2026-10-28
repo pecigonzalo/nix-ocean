@@ -3,7 +3,6 @@
   virtualisation.oci-containers.containers = {
     recyclarr = proxied {
       name = "recyclarr";
-      proxy = false;
       container = {
         # Pinned: upstream stopped publishing tags after 8.3.2, so `latest`
         # no longer resolves and `--pull=always` needs a tag that exists.

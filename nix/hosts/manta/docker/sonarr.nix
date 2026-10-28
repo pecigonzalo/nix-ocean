@@ -3,7 +3,7 @@
   virtualisation.oci-containers.containers = {
     sonarr = proxied {
       name = "sonarr";
-      port = 8989;
+      route.port = 8989;
       container = {
         image = "ghcr.io/linuxserver/sonarr:4.0.20.3014-ls329";
         environment = {

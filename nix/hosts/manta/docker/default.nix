@@ -5,46 +5,61 @@
   ...
 }:
 let
-  # Wrap container definitions to simplify instantiation
+  # Wrap container definitions so every service gets the same defaults and,
+  # when `route` is set, the same Traefik wiring.
+  #
+  # `route = null` runs the container without publishing it. Inside a route:
+  #   host     subdomain under `domain` (optional, else the provider default)
+  #   rule     full router rule, for what `host` cannot express
+  #   port     container port Traefik should target
+  #   authelia attach the authelia@docker middleware (default true)
+  #   scheme   http or https towards the container
+  #   network  docker network Traefik should use, when not `proxy`
   proxied =
     {
       name,
-      proxy ? true,
-      auth ? true,
-      host ? null,
-      port ? null,
-      domain ? "munin.xyz",
+      route ? null,
       container,
     }:
     let
-      existingOptions = container.extraOptions or [ ];
-      # The container's own networks win; proxied containers default to proxy.
-      containerNetworks = container.networks or (lib.optional proxy "proxy");
-      proxyOptions =
-        if proxy then
-          [ "--label=traefik.enable=true" ]
-          # Point the provider at the right network when it is not the default
-          # one, so a container can live off the shared proxy network.
-          ++ lib.optional (!(builtins.elem "proxy" containerNetworks))
-            "--label=traefik.docker.network=${builtins.head containerNetworks}"
-          ++ lib.optional auth "--label=traefik.http.routers.${name}.middlewares=authelia@docker"
-          ++ lib.optional (
-            port != null
-          ) "--label=traefik.http.services.${name}.loadbalancer.server.port=${toString port}"
-          ++ lib.optional (host != null) "--label=traefik.http.routers.${name}.rule=Host(`${host}.${domain}`)"
-        else
-          [ ];
-      newContainer = container // {
-        # Pull on every start, independent of whether the container is proxied.
-        # Without this a restart reuses the local image forever, which is how
-        # WordPress ended up on a vulnerable PHP release (CVE-2026-109618).
-        extraOptions = existingOptions ++ proxyOptions;
-        networks = lib.unique containerNetworks;
-        pull = container.pull or "always";
-        log-driver = "local";
+      routeRule =
+        route.rule or (
+          if (route.host or null) != null then
+            "Host(`${route.host}.${route.domain or "munin.xyz"}`)"
+          else
+            null
+        );
+      routeLabels = {
+        "traefik.enable" = "true";
+      }
+      // lib.optionalAttrs (routeRule != null) {
+        "traefik.http.routers.${name}.rule" = routeRule;
+      }
+      // lib.optionalAttrs (route.authelia or true) {
+        "traefik.http.routers.${name}.middlewares" = "authelia@docker";
+      }
+      // lib.optionalAttrs ((route.port or null) != null) {
+        "traefik.http.services.${name}.loadbalancer.server.port" = toString route.port;
+      }
+      // lib.optionalAttrs ((route.scheme or null) != null) {
+        "traefik.http.services.${name}.loadbalancer.server.scheme" = route.scheme;
+      }
+      // lib.optionalAttrs ((route.network or null) != null) {
+        "traefik.docker.network" = route.network;
       };
     in
-    newContainer;
+    container
+    // {
+      # Pull on every start. Without this a restart reuses the local image
+      # forever, which is how WordPress ended up on a vulnerable PHP release
+      # (CVE-2026-109618).
+      pull = container.pull or "always";
+      log-driver = container.log-driver or "local";
+    }
+    // lib.optionalAttrs (route != null) {
+      networks = lib.unique ((container.networks or [ ]) ++ [ (route.network or "proxy") ]);
+      labels = (container.labels or { }) // routeLabels;
+    };
 
   dockerNetworks = lib.unique (
     lib.concatMap (container: container.networks or [ ]) (

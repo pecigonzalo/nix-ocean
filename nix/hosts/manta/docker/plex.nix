@@ -65,8 +65,10 @@ in
   virtualisation.oci-containers.containers = {
     # jelly = proxied {
     #   name = "jelly";
-    #   port = 8096;
-    #   auth = false;
+    #   route = {
+    #     port = 8096;
+    #     authelia = false;
+    #   };
     #   container = {
     #     image = "jellyfin/jellyfin";
     #     user = "995:995";
@@ -127,8 +129,11 @@ in
     };
     plex = proxied {
       name = "plex";
-      port = 32400;
-      auth = false;
+      route = {
+        port = 32400;
+        authelia = false;
+        scheme = "https";
+      };
       container = {
         dependsOn = [ "plex-proxy" ];
         image = "plexinc/pms-docker";
@@ -153,7 +158,6 @@ in
           "--add-host=pubsub06.pop.fra.plex.bz:172.21.0.150"
           "--add-host=v4.plex.tv:172.21.0.150"
           "--add-host=metadata.prod.hosting.plex.tv:172.21.0.150"
-          "--label=traefik.http.services.plex.loadbalancer.server.scheme=https"
           "--memory=8G"
           "--tmpfs=/transcode:size=6g,noexec,nodev,nosuid,gid=995,uid=995"
         ];

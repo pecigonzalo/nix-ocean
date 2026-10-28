@@ -6,8 +6,10 @@ in
   virtualisation.oci-containers.containers = {
     ghost = proxied {
       name = "ghost";
-      host = "hugin";
-      auth = false;
+      route = {
+        host = "hugin";
+        authelia = false;
+      };
       container = {
         image = "ghost:5";
         environment = {

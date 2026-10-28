@@ -7,7 +7,7 @@
   virtualisation.oci-containers.containers = {
     wealthfolio = proxied {
       name = "wealthfolio";
-      port = 8088;
+      route.port = 8088;
       container = {
         image = "ghcr.io/wealthfolio/wealthfolio:latest";
         environment = {

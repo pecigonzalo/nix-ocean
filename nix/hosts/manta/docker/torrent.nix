@@ -9,8 +9,10 @@ in
   virtualisation.oci-containers.containers = {
     qbittorrent = proxied {
       name = "qbit";
-      port = 8080;
-      host = "qbit";
+      route = {
+        host = "qbit";
+        port = 8080;
+      };
       container = {
         image = "linuxserver/qbittorrent:latest";
         ports = [
@@ -36,8 +38,10 @@ in
     };
     qui = proxied {
       name = "qui";
-      port = 7476;
-      host = "qui";
+      route = {
+        host = "qui";
+        port = 7476;
+      };
       container = {
         image = "ghcr.io/autobrr/qui:v1.28";
         environment = {

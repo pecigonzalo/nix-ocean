@@ -3,7 +3,7 @@
   virtualisation.oci-containers.containers = {
     trek = proxied {
       name = "trek";
-      port = 3000;
+      route.port = 3000;
       container = {
         image = "mauriceboe/trek:latest";
         environment = {

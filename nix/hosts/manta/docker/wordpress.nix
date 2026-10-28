@@ -1,12 +1,10 @@
 {
   config,
-  lib,
   proxied,
   ...
 }:
 let
   julesinaboxDomain = "julesinabox.com";
-  thekiwidiariesDomain = "thekiwidiaries.com";
   wordpressDbPassword = config.age.secrets.wordpress-db-password.path;
   # Explicit PHP branch: `wordpress:latest` tracks the oldest supported PHP (8.3).
   wordpressImage = "wordpress:php8.5-apache";
@@ -17,7 +15,6 @@ let
     "--cap-drop=ALL"
     "--cap-add=NET_BIND_SERVICE"
   ];
-  exposeWordpress = false;
 in
 {
   virtualisation.oci-containers.containers = {
@@ -40,52 +37,36 @@ in
       log-driver = "local";
     };
 
+    # Both sites are unpublished for now. To publish one, give it a route, for
+    # example:
+    #   route = {
+    #     rule = "Host(`julesinabox.com`) || Host(`www.julesinabox.com`)";
+    #     authelia = false;
+    #   };
+    # They stay on the proxy network so they can reach wordpress-db by name.
     julesinabox = proxied {
       name = "julesinabox";
-      proxy = exposeWordpress;
-      auth = false;
       container = {
         image = wordpressImage;
         user = "${toString config.users.users.wordpress.uid}:${toString config.users.groups.wordpress.gid}";
+        networks = [ "proxy" ];
         volumes = [
           "/data/containers/wordpress/www/julesinabox:/var/www/html"
         ];
-        extraOptions =
-          lib.optional exposeWordpress "--label=traefik.http.routers.julesinabox.rule=Host(`${julesinaboxDomain}`) || Host(`www.${julesinaboxDomain}`)"
-          ++ hardeningOptions
-          ++ [ "--memory=256M" ];
+        extraOptions = hardeningOptions ++ [ "--memory=256M" ];
       };
     };
     portfolio = proxied {
       name = "portfolio";
-      proxy = exposeWordpress;
-      auth = false;
       container = {
         image = wordpressImage;
         user = "${toString config.users.users.wordpress.uid}:${toString config.users.groups.wordpress.gid}";
+        networks = [ "proxy" ];
         volumes = [
           "/data/containers/wordpress/www/portfolio:/var/www/html"
         ];
-        extraOptions =
-          lib.optional exposeWordpress "--label=traefik.http.routers.portfolio.rule=Host(`portfolio.${julesinaboxDomain}`) || Host(`www.portfolio.${julesinaboxDomain}`)"
-          ++ hardeningOptions
-          ++ [ "--memory=256M" ];
+        extraOptions = hardeningOptions ++ [ "--memory=256M" ];
       };
     };
-    # Temporary Disable
-    # tkd = proxied {
-    #   name = "tkd";
-    #   auth = false;
-    #   container = {
-    #     image = wordpressImage;
-    #     user = "${toString config.users.users.wordpress.uid}:${toString config.users.groups.wordpress.gid}";
-    #     volumes = [
-    #       "/data/containers/wordpress/www/thekiwidiaries:/var/www/html"
-    #     ];
-    #     extraOptions = [
-    #       "--label=traefik.http.routers.thekiwidiaries.rule=Host(`${thekiwidiariesDomain}`) || Host(`www.${thekiwidiariesDomain}`)"
-    #     ] ++ hardeningOptions;
-    #   };
-    # };
   };
 }
