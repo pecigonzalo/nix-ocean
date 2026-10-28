@@ -20,6 +20,7 @@ in
   virtualisation.oci-containers.containers = {
     wordpress-db = {
       image = "linuxserver/mariadb:latest";
+      pull = "always";
       environment = {
         PUID = toString config.users.users.wordpress.uid;
         PGID = toString config.users.groups.wordpress.gid;
@@ -30,10 +31,7 @@ in
         "${wordpressDbPassword}:/secrets/db-password:ro"
       ];
       networks = [ "proxy" ];
-      extraOptions = [
-        "--pull=always"
-        "--memory=512M"
-      ];
+      extraOptions = [ "--memory=512M" ];
     };
 
     # Both sites are unpublished for now. To publish one, give it a route, for

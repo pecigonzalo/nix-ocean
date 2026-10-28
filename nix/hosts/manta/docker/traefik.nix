@@ -26,6 +26,7 @@ in
   virtualisation.oci-containers.containers = {
     traefik = {
       image = "traefik:v3.6";
+      pull = "always";
       dependsOn = [ "socket-proxy" ];
       # auth: reach Authelia for forwardAuth. dockerapi: only socket-proxy.
       networks = [
@@ -41,7 +42,6 @@ in
         "443:443"
       ];
       extraOptions = [
-        "--pull=always"
         "--label=traefik.enable=true"
         "--label=traefik.http.routers.api.service=api@internal"
         "--label=traefik.http.routers.api.middlewares=authelia@docker"

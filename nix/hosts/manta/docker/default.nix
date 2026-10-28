@@ -63,11 +63,20 @@ let
       labels = (container.labels or { }) // routeLabels;
     };
 
+  docker = "${pkgs.docker}/bin/docker";
+
   dockerNetworks = lib.unique (
     lib.concatMap (container: container.networks or [ ]) (
       lib.attrValues config.virtualisation.oci-containers.containers
     )
   );
+
+  # proxy is pinned to a fixed subnet because plex-tunnel uses a static IP on
+  # it, and the default IPAM pool depends on the order networks were created.
+  proxyNetwork = lib.optionalString (lib.elem "proxy" dockerNetworks) ''
+    ${docker} network inspect proxy >/dev/null 2>&1 \
+      || ${docker} network create --label=ocean.managed=true --subnet=172.21.0.0/16 proxy
+  '';
 in
 {
   virtualisation.oci-containers.backend = "docker";
@@ -86,11 +95,25 @@ in
         RemainAfterExit = true;
       };
       script = ''
-        # Derived from the container definitions, so no module has to remember
-        # to add its network here.
-        for network in ${lib.escapeShellArgs dockerNetworks}; do
-          ${pkgs.docker}/bin/docker network inspect "$network" >/dev/null 2>&1 \
-            || ${pkgs.docker}/bin/docker network create "$network"
+        declared="${lib.concatStringsSep " " dockerNetworks}"
+
+        ${proxyNetwork}
+
+        for network in ${lib.escapeShellArgs (lib.remove "proxy" dockerNetworks)}; do
+          ${docker} network inspect "$network" >/dev/null 2>&1 \
+            || ${docker} network create --label=ocean.managed=true "$network"
+        done
+
+        # Drop networks this service created that are no longer declared. Only
+        # labelled ones, so networks made by hand are never touched, and the
+        # removal is allowed to fail because a container can still hold one
+        # while it is being restarted.
+        for network in $(${docker} network ls \
+            --filter label=ocean.managed=true --format '{{.Name}}'); do
+          case " $declared " in
+            *" $network "*) ;;
+            *) ${docker} network rm "$network" >/dev/null 2>&1 || true ;;
+          esac
         done
       '';
     };

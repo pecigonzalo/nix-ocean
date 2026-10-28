@@ -12,6 +12,7 @@ in
       };
       container = {
         image = "ghost:5";
+        pull = "always";
         environment = {
           url = "https://hugin.munin.xyz";
           database__client = "mysql";
@@ -36,7 +37,6 @@ in
         "${ghost_db_password}:/secrets/db-password:ro"
       ];
       extraOptions = [
-        "--pull=always"
         "--network=proxy"
       ];
     };

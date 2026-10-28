@@ -92,6 +92,7 @@ in
     # };
     plex-tunnel = {
       image = "ghcr.io/tailscale/tailscale:latest";
+      pull = "always";
       environmentFiles = [
         config.age.secrets.tailscale-proxy.path
       ];
@@ -114,6 +115,9 @@ in
     plex-proxy = {
       dependsOn = [ "plex-tunnel" ];
       image = "nixery.dev/haproxy";
+      # Nixery builds the image on request, so pulling on every start would
+      # make Plex depend on nixery.dev being up. Keep the local copy.
+      pull = "missing";
       cmd = [
         "haproxy"
         "-db"
