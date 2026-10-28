@@ -32,9 +32,9 @@ in
         "/data/containers/wordpress-db/config:/config"
         "${wordpressDbPassword}:/secrets/db-password:ro"
       ];
+      networks = [ "proxy" ];
       extraOptions = [
         "--pull=always"
-        "--network=proxy"
         "--memory=512M"
       ];
       log-driver = "local";

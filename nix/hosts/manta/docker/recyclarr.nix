@@ -11,12 +11,10 @@
         volumes = [
           "/data/containers/recyclarr/config:/config"
         ];
-        extraOptions = [
-          # Sonarr/Radarr are only on the proxy network; recyclarr needs name
-          # resolution to reach them and must not be exposed through Traefik.
-          "--network=proxy"
-          "--memory=512M"
-        ];
+        # Sonarr/Radarr are only on the proxy network; recyclarr needs name
+        # resolution to reach them and must not be exposed through Traefik.
+        networks = [ "proxy" ];
+        extraOptions = [ "--memory=512M" ];
       };
     };
   };

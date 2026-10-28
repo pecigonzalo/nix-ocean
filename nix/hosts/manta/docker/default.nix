@@ -17,13 +17,16 @@ let
       container,
     }:
     let
-      existingOptions = if (container ? extraOptions) then container.extraOptions else [ ];
+      existingOptions = container.extraOptions or [ ];
+      # The container's own networks win; proxied containers default to proxy.
+      containerNetworks = container.networks or (lib.optional proxy "proxy");
       proxyOptions =
         if proxy then
-          [
-            "--network=proxy"
-            "--label=traefik.enable=true"
-          ]
+          [ "--label=traefik.enable=true" ]
+          # Point the provider at the right network when it is not the default
+          # one, so a container can live off the shared proxy network.
+          ++ lib.optional (!(builtins.elem "proxy" containerNetworks))
+            "--label=traefik.docker.network=${builtins.head containerNetworks}"
           ++ lib.optional auth "--label=traefik.http.routers.${name}.middlewares=authelia@docker"
           ++ lib.optional (
             port != null
@@ -35,11 +38,19 @@ let
         # Pull on every start, independent of whether the container is proxied.
         # Without this a restart reuses the local image forever, which is how
         # WordPress ended up on a vulnerable PHP release (CVE-2026-109618).
-        extraOptions = existingOptions ++ [ "--pull=always" ] ++ proxyOptions;
+        extraOptions = existingOptions ++ proxyOptions;
+        networks = lib.unique containerNetworks;
+        pull = container.pull or "always";
         log-driver = "local";
       };
     in
     newContainer;
+
+  dockerNetworks = lib.unique (
+    lib.concatMap (container: container.networks or [ ]) (
+      lib.attrValues config.virtualisation.oci-containers.containers
+    )
+  );
 in
 {
   virtualisation.oci-containers.backend = "docker";
@@ -58,7 +69,9 @@ in
         RemainAfterExit = true;
       };
       script = ''
-        for network in proxy plex immich; do
+        # Derived from the container definitions, so no module has to remember
+        # to add its network here.
+        for network in ${lib.escapeShellArgs dockerNetworks}; do
           ${pkgs.docker}/bin/docker network inspect "$network" >/dev/null 2>&1 \
             || ${pkgs.docker}/bin/docker network create "$network"
         done
@@ -80,6 +93,7 @@ in
     ./traefik.nix
     ./plex.nix
     ./immich.nix
+    ./socket-proxy.nix
     ./bazarr.nix
     ./radarr.nix
     ./sonarr.nix

@@ -1,4 +1,9 @@
-{ config, pkgs, proxied, ... }:
+{
+  config,
+  pkgs,
+  proxied,
+  ...
+}:
 let
   haproxyConfig = pkgs.writeText "plex-egress.cfg" ''
     global
@@ -97,9 +102,9 @@ in
         TS_USERSPACE = "false";
       };
       volumes = [ "/data/containers/tailscale/var/lib/tailscale:/var/lib/tailscale" ];
+      networks = [ "proxy" ];
       extraOptions = [
         "--ip=172.21.0.150"
-        "--network=proxy"
         "--cap-add=NET_ADMIN"
         "--dns=100.101.146.118"
       ];

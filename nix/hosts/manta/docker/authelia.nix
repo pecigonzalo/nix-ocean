@@ -89,6 +89,9 @@ in
       auth = false;
       container = {
         image = "authelia/authelia:4";
+        # Only Traefik is on this network, so the other apps cannot reach the
+        # Authelia API.
+        networks = [ "auth" ];
         environment = {
           AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE = "/secrets/jwt-secret";
           AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE = "/secrets/storage-key";
